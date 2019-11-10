@@ -68,7 +68,7 @@ function drawboard(){
 	for(var i = 0; i < 14; i++){
 		for(var j = 0; j < board[i].length; j++){
 			if(board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow"){
-				document.getElementById("" + i + "." + j).style.backgroundImage = "url('media/" + board[i][j] + "_stone.png')";
+				document.getElementById("" + i + "." + j).style.backgroundImage = "url('" + board[i][j] + "_stone.png')";
 			}
 			else{
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url()";

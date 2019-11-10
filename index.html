@@ -7,9 +7,8 @@ session_start();
 <meta name="description" content="An Online version of the board game Mancala." />
 <meta name="keywords" content="media, entertainment, fun, games, Mancala" />
 <meta name="author" content="Briton Westerhaus" />
-<link rel="stylesheet" type="text/css" href="style/Mancala.css" />
-<script src="script/comment.js"></script>
-<script src="script/Mancala.js"></script>
+<link rel="stylesheet" type="text/css" href="default.css" />
+<script src="default.js"></script>
 <?php include("script/content.php"); ?>
 <?php include("begin.html");?>
 <?php View(); ?>
@@ -43,10 +42,10 @@ session_start();
 	<td class="select">
 		<table class="select">
 			<tr>
-				<td class="player"><img src="media/arrow.png" id="playertwo" style="visibility:hidden" /></td>
+				<td class="player"><img src="arrow.png" id="playertwo" style="visibility:hidden" /></td>
 			</tr>
 			<tr>
-				<td class="player"><img src="media/arrow.png" id="playerone" /></td>
+				<td class="player"><img src="arrow.png" id="playerone" /></td>
 			</tr>
 		</table>
 	</td>
@@ -516,22 +515,6 @@ session_start();
 <p>
 The goal of the game is to have the most stones in your cache at the end of the game.  There are four colors of stones but they are all the same.  To take a turn, click on a pit on your side of the board (bottom for player 1, top for player 2).  The stones will be placed one at a time in the pits in a counter-clockwise fashion.  If your last stone lands in your cache, you get another turn.  If your last stone lands in an empty pit on your side, that stone and all the stones opposite are placed in your cache.
 </p>
-<br />
-<a href="comment.php?category=games&content=Mastermind">Comment</a>
-<br />
-<?php DisplayShareLinks(); ?><br /><button id="butt" onclick="showcomment();">Post a Comment</button>
-<form id="commentarea" action="comment.php" method="post" style="visibility:hidden" onsubmit"return validate(<?php echo isset($_SESSION[username]); ?>)">
-</form>
-<?php CommentsAndRating(); ?>
-<table class="comments" border="2">
-<tr>
-<th class="user">User</th>
-<th class="comment">Comment</th>
-<th class="rating">Rating</th>
-<th>Date</th>
-</tr>
-<?php DisplayComments(); ?>
-</table>
 </table>
 </div>
 </center>
