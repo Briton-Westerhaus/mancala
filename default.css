@@ -7,6 +7,16 @@ body {
 	text-align: center;
 }
 
+h2 {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+h3 {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
 .content {
 	position: relative;
 	display: inline-block;
