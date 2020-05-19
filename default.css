@@ -1,91 +1,121 @@
-.cache{
-	width:122px;
-	height:292px;
-	background-image:url("cache.jpg");
-	height:100%
-	width:100%
+* {
+	margin: 0px;
+	padding: 0px;
 }
-.wholeboard{
-	width:610px;
-	height:292px;
+
+body {
+	text-align: center;
 }
-.select{
-	height:292px;
-	widhth:90px;
+
+h2 {
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
-.player{
-	height:146px;
-	width:90px;
-	background-repeat:no-repeat;
-	vertical-align:center;
+
+h3 {
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
-table{
-	border-collapse:collapse;
-	border-width:0px;
-	border-spacing:0px;
-	border-style:none;
+
+.content {
+	position: relative;
+	display: inline-block;
+	margin-left: auto;
+	margin-right: auto;
 }
-td{
-	border-width:0px;
-	padding:0px;
+
+#game {
+	display: inline-block;
 }
-.comments{
-	border-collapse:separate;
-	border-width:1px;
-	border-spacing:2px;
-	border-style:outset;
+
+.cache {
+	width: 122px;
+	height: 292px;
+	background-image: url("cache.jpg");
+	height: 100%;
 }
-.comments td{
-	border-width:1px;
-	padding:1px;
+
+.wholeboard {
+	width: 610px;
+	height: 292px;
 }
-.board{
-	width:366px;
-	height:292px;
+
+.select {
+	height: 292px;
+	width: 90px;
 }
-.square{
-	width:61px;
-	height:146px;
-	background-image:url("board_square.jpg");
-	height:100%
-	width:100%
+
+.player {
+	height: 146px;
+	width: 90px;
+	background-repeat: no-repeat;
+	vertical-align: center;
 }
-.slot{
-	width:15px;
-	height:15px;
+
+table {
+	border-collapse: collapse;
+	border-width: 0px;
+	border-spacing: 0px;
+	border-style: none;
 }
-.leftcolumn{
-	vertical-align:center;
-	position:relative;
-	left:15px;
-	width:15px;
-	height:120px;
+
+td {
+	border-width: 0px;
+	padding: 0px;
 }
-.rightcolumn{
+
+.board {
+	width: 366px;
+	height: 292px;
+}
+
+.square {
+	width: 61px;
+	height: 146px;
+	background-image: url("board_square.jpg");
+}
+
+.slot {
+	width: 15px;
+	height: 15px;
+}
+
+.leftcolumn {
+	vertical-align: center;
+	position: relative;
+	left: 15px;
+	width: 15px;
+	height: 120px;
+}
+
+.rightcolumn {
 	vertical-align:center;
 	position:relative;
 	right:0px;
 	width:15px;
 	height:105px;
 }
-.leftcache{
-	vertical-align:center;
-	left:35px;
-	position:relative;
-	width:15px;
-	height:165px;
+
+.leftcache {
+	vertical-align: center;
+	left: 35px;
+	position: relative;
+	width: 15px;
+	height: 165px;
 }
-.middlecache{
-	vertical-align:center;
-	position:relative;
-	left:7px;
-	width:15px;
-	height:180px;
+
+.middlecache {
+	vertical-align: center;
+	position: relative;
+	left: 7px;
+	width: 15px;
+	height: 180px;
 }
-.rightcache{
-	vertical-align:center;
-	position:relative;
-	right:20px;
-	width:15px;
-	height:165px;
+
+.rightcache {
+	vertical-align: center;
+	position: relative;
+	right: 20px;
+	width: 15px;
+	height: 165px;
 }
