@@ -12,11 +12,11 @@ function initializeboard() {
 	var temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").style.backgroundColor = 'yellow';
-	for(var i = 0; i < 6; i++){
+	for (var i = 0; i < 6; i++) {
 		board[i] = new Array(15);
-		for(var j = 0; j < 3; j++){
+		for (var j = 0; j < 3; j++) {
 			temp = Math.round(3 * Math.random());
-			switch(temp){
+			switch (temp) {
 				case 0:
 					board[i][j] = "blue";
 					break;
@@ -36,9 +36,9 @@ function initializeboard() {
 		}
 	}
 	board[6] = new Array(34);//right cache
-	for(var i = 7; i < 13; i++){
+	for (var i = 7; i < 13; i++) {
 		board[i] = new Array(15);
-		for(var j = 0; j < 3; j++){
+		for (var j = 0; j < 3; j++) {
 			temp = Math.round(3 * Math.random());
 			switch(temp){
 				case 0:
@@ -117,7 +117,7 @@ function computerTurn() {
 				return;
 			} else {
 				user[0] = !user[0];
-				setTimeout("computerTurn();", 12);
+				//setTimeout("computerTurn();", 12);
 				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
 		}
@@ -341,7 +341,8 @@ function moveStones(element) {
 		
 		if (players == 1 && !user[0]) {
 			drawBoard();
-			setTimeout("computerTurn();", 12);
+			//setTimeout("computerTurn();", 12);
+			computerTurn();
 			scores[0] = 0;
 			scores[1] = 0;
 			for (var i = 0; i < 34; i++) {
