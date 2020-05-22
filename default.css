@@ -119,3 +119,7 @@ td {
 	width: 15px;
 	height: 165px;
 }
+
+.currentPlayer {
+	background-color: yellow;
+}
