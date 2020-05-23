@@ -123,3 +123,17 @@ td {
 .currentPlayer {
 	background-color: yellow;
 }
+
+.currentPlayer::before {
+	content: url('arrow.png');
+	height: 1em;
+	object-fit: contain;
+	display: inline-block;
+}
+
+#player1, #player2 {
+	display: inline-block;
+	width: 50%;
+	text-align: left;
+	object-fit: contain;
+}
