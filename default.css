@@ -28,11 +28,10 @@ h3 {
 	display: inline-block;
 }
 
-.cache {
+table.cache {
 	width: 122px;
 	height: 292px;
 	background-image: url("cache.jpg");
-	height: 100%;
 }
 
 .wholeboard {
@@ -122,13 +121,6 @@ td {
 
 .currentPlayer {
 	background-color: yellow;
-}
-
-.currentPlayer::before {
-	content: url('arrow.png');
-	height: 1em;
-	object-fit: contain;
-	display: inline-block;
 }
 
 #player1, #player2 {
