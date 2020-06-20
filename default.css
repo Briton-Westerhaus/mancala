@@ -28,11 +28,10 @@ h3 {
 	display: inline-block;
 }
 
-.cache {
+table.cache {
 	width: 122px;
 	height: 292px;
 	background-image: url("cache.jpg");
-	height: 100%;
 }
 
 .wholeboard {
@@ -118,4 +117,23 @@ td {
 	right: 20px;
 	width: 15px;
 	height: 165px;
+}
+
+.currentPlayer {
+	background-color: yellow;
+}
+
+#player1, #player2 {
+	display: inline-block;
+	width: auto;
+	object-fit: contain;
+}
+
+#player1 {
+	float: right;
+}
+
+#player2 {
+	float: left;
+	padding-left: 90px;
 }

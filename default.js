@@ -11,7 +11,7 @@ function initializeboard() {
 //sets all the variables for the game then places the stones on the board with the drawBoard() function
 	var temp;
 	//these three lines set the "scoreboard"
-	document.getElementById("player1").style.backgroundColor = 'yellow';
+	document.getElementById("player1").className = 'currentPlayer';
 	for (var i = 0; i < 6; i++) {
 		board[i] = new Array(15);
 		for (var j = 0; j < 3; j++) {
@@ -65,12 +65,11 @@ function initializeboard() {
 
 function drawBoard() {
 	// places or removes stones from the board
-	for(var i = 0; i < 14; i++){
-		for(var j = 0; j < board[i].length; j++){
-			if(board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow"){
+	for (var i = 0; i < 14; i++) {
+		for (var j = 0; j < board[i].length; j++) {
+			if (board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow") {
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url('" + board[i][j] + "_stone.png')";
-			}
-			else{
+			} else {
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url()";
 			}
 		}
@@ -79,7 +78,7 @@ function drawBoard() {
 
 function humanTurn(element){
 	//this is called when a player clicks on a board square
-	if(board[element.id][0] == null || board[element.id][0] == ""){
+	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
 	moveStones(element);
@@ -113,7 +112,7 @@ function computerTurn() {
 		user[0] = !user[0];
 		empty = isEmpty(board, !user[0]);
 		if (empty) {
-			if(getNumStones(board, 13) + getNumStones(board, 6) == 36){
+			if (getNumStones(board, 13) + getNumStones(board, 6) == 36) {
 				return;
 			} else {
 				user[0] = !user[0];
@@ -188,14 +187,14 @@ function getNumStones(theBoard, elemNum) {
 function switchUser() {
 	user[0] = !user[0];
 	if (user[0]) {
-		document.getElementById("player1").style.backgroundColor = 'yellow';
-		document.getElementById("player2").style.backgroundColor = 'white';
+		document.getElementById("player1").className = "currentPlayer";
+		document.getElementById("player2").className = "";
 		document.getElementById("playerone").style.visibility="visible";
 		document.getElementById("playertwo").style.visibility="hidden";
 	}
 	if (!user[0]) {
-		document.getElementById("player2").style.backgroundColor = 'yellow';
-		document.getElementById("player1").style.backgroundColor = 'white';
+		document.getElementById("player2").className = "currentPlayer";
+		document.getElementById("player1").className = "";
 		document.getElementById("playertwo").style.visibility="visible";
 		document.getElementById("playerone").style.visibility="hidden";
 	}
@@ -341,7 +340,6 @@ function moveStones(element) {
 		
 		if (players == 1 && !user[0]) {
 			drawBoard();
-			//setTimeout("computerTurn();", 12);
 			computerTurn();
 			scores[0] = 0;
 			scores[1] = 0;
@@ -474,23 +472,23 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	}
 }
 
-function copyBoard(theBoard){
+function copyBoard(theBoard) {
 	var returnBoard = Array(theBoard.length);
-	for(var i = 0; i < theBoard.length; i++){
+	for (var i = 0; i < theBoard.length; i++){
 		returnBoard[i] = theBoard[i].slice();
 	}
 	return returnBoard;
 }
 
-function isEmpty(theBoard, theUser){
+function isEmpty(theBoard, theUser) {
 	var i = 0;
 	var max = 6;
-	if(!theUser){
+	if (!theUser) {
 		i = 7;
 		max = 13;
 	}
-	for(i; i < max; i++){
-		if(theBoard[i][0] != null && theBoard[i][0] != "")
+	for (i; i < max; i++) {
+		if (theBoard[i][0] != null && theBoard[i][0] != "")
 			return false;
 	}
 	return true;
