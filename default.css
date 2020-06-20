@@ -125,7 +125,15 @@ td {
 
 #player1, #player2 {
 	display: inline-block;
-	width: 50%;
-	text-align: left;
+	width: auto;
 	object-fit: contain;
+}
+
+#player1 {
+	float: right;
+}
+
+#player2 {
+	float: left;
+	padding-left: 90px;
 }
