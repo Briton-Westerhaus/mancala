@@ -11,6 +11,7 @@
 	<body>
 		<div class="content">
 			<h2>Mancala</h2>
+			<button class="help" onclick="showModal()">?</button>
 			<div id="startgame">
 				<h3>How many players?</h3>
 				<button onclick="setPlayers(1)">&nbsp&nbsp&nbsp 1 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
@@ -503,8 +504,14 @@
 			</div>
 			<!--end game board-->
 			<script type="text/javascript">initializeboard();</script>
-			<h3>How to play:</h3>
-			<p>The goal of the game is to have the most stones in your cache at the end of the game.  There are four colors of stones but they are all the same.  To take a turn, click on a pit on your side of the board (bottom for player 1, top for player 2).  The stones will be placed one at a time in the pits in a counter-clockwise fashion.  If your last stone lands in your cache, you get another turn.  If your last stone lands in an empty pit on your side, that stone and all the stones opposite are placed in your cache.</p>
+			</div>
+			<div id="ModalContainer">
+				<div class="modal">
+					<h3>How to play:</h3>
+					<p>The goal of the game is to have the most stones in your cache at the end of the game.  There are four colors of stones but they are all the same.</p>
+					<p>To take a turn, click on a pit on your side of the board (bottom for player 1, top for player 2).  The stones will be placed one at a time in the pits in a counter-clockwise fashion.  If your last stone lands in your cache, you get another turn.  If your last stone lands in an empty pit on your side, that stone and all the stones opposite are placed in your cache.</p>
+					<button onclick="hideModal()">&#10004;</button>
+				</div>
 			</div>
 		</div>
 	</body>

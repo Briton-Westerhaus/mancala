@@ -7,6 +7,14 @@ scores[0] = 0;
 scores[1] = 0;
 var names = Array(2);
 
+function showModal() {
+    document.getElementById("ModalContainer").style.display = "block";  
+}
+
+function hideModal() {
+    document.getElementById("ModalContainer").style.display = "None";
+}
+
 function initializeboard() {
 //sets all the variables for the game then places the stones on the board with the drawBoard() function
 	var temp;
