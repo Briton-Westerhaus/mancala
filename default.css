@@ -10,6 +10,7 @@ body {
 h2 {
 	margin-top: 1em;
 	margin-bottom: 1em;
+	display: inline-block;
 }
 
 h3 {
@@ -136,4 +137,74 @@ td {
 #player2 {
 	float: left;
 	padding-left: 90px;
+}
+
+button.help{
+    height: 1.5em;
+    width: 1.5em;
+    border-radius: .75em;
+    font-size: .75em;
+    float: none;
+    border: 2px ridge rgb(92, 127, 233);
+    padding: 0px;
+    background-color: rgb(184, 202, 255);
+    box-shadow: none;
+    font-weight: bold;
+    position: relative;
+    left: 17em;
+}
+
+#ModalContainer{
+    background-color: rgba(155, 155, 155, .5);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    display: none;
+}
+
+.modal {
+    width: 40%;
+    height: 30%;
+    position: absolute;
+    border: 1px solid black;
+    left: 30%;
+    top: 35%;
+    background-color: white;
+    padding: 20px;
+}
+
+.modal h3 {
+    text-align: center;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.modal button {
+	font-size: 1.5em;
+    float: right;
+    padding: .25em;
+    border-radius: 10px;
+	cursor: pointer;
+	border: none;
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    font-size: 1em;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: rgb(136, 235, 162);
+    box-shadow: 0px 0px 2px 2px rgb(104, 196, 128) inset;
+    top: 6%;
+}
+
+.modal button:hover {
+    background-color: rgb(104, 196, 128);
+    box-shadow: 0px 0px 2px 2px rgb(136, 235, 162) inset;
+}
+
+.modal p {
+	text-align: left;
+	margin-bottom: 1em;
 }
