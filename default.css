@@ -92,6 +92,8 @@ td {
 .slot {
 	width: 15px;
 	height: 15px;
+	transition: transform .5s ease;
+	/*transform: translate(61px, 0px);*/
 }
 
 .leftcolumn {
