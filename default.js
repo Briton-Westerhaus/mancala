@@ -254,11 +254,13 @@ async function moveStones(element) {
 			for (i = 0; i < board[spot].length; i++) {
 				if (board[spot][i] == "" || board[spot][i] == null) {
 					board[spot][i] = toMove[j];
+					document.getElementById(element.id + "." + j).style.transform = "translate(" + (61 * (spot - element.id)) + "px, 30px)";
 					i = board[spot].length;
 				}
 			}
-			await new Promise(r => setTimeout(r, 500));
-			drawBoard();
+
+			await new Promise(r => setTimeout(r, 300));
+			//drawBoard();
 		}
 		if (spot == 6 && user[0] || spot == 13 && !user[0])
 			switchUser();
