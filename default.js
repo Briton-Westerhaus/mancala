@@ -237,17 +237,17 @@ function setDifficulty(howHard) {
 	document.getElementById("game").style.visibility = "visible";
 }
 
-function moveStones(element) {
+async function moveStones(element) {
 	if((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
 		var toMove = new Array(15);
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[element.id][i];
 			board[element.id][i] = "";
 		}
-		var j = 0;
 		var i;
 		var spot = element.id;
-		while (toMove[j] != "" && toMove[j] != null) {
+
+		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			spot++;
 			if (spot > 13)
 				spot = 0;
@@ -257,7 +257,8 @@ function moveStones(element) {
 					i = board[spot].length;
 				}
 			}
-			j++;
+			await new Promise(r => setTimeout(r, 500));
+			drawBoard();
 		}
 		if (spot == 6 && user[0] || spot == 13 && !user[0])
 			switchUser();
