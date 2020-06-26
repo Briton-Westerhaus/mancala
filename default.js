@@ -281,7 +281,6 @@ async function moveStones(element) {
 			}
 
 			await new Promise(r => setTimeout(r, 300));
-			//drawBoard();
 		}
 		if (spot == 6 && user[0] || spot == 13 && !user[0])
 			switchUser();
