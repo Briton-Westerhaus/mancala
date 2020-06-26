@@ -80,6 +80,7 @@ function drawBoard() {
 			} else {
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url()";
 			}
+			document.getElementById("" + i + "." + j).style.transform = "";
 		}
 	}
 }
