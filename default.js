@@ -238,6 +238,26 @@ function setDifficulty(howHard) {
 }
 
 async function moveStones(element) {
+	
+	function getTransform(oldPit, newPit, oldIndex, newIndex) {
+
+		function getYOffset(index) {
+			if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
+				return Math.floor(index / 2) * 7.5;
+			} else if (Math.ceil(index / 2) % 2 == 1) { // Down/Positive
+				return 0 - (Math.floor(index / 2) + 1) * 7.5
+			}
+		}
+
+		let xOffset, yOffset = 0;
+		xOffset = 61 * (newPit - oldPit);
+		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		
+		yOffset = getYOffset(oldIndex) - getYOffset(newIndex);
+
+		return "translate(" + xOffset + "px, " + yOffset + "px)"
+	}
+	
 	if((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
 		var toMove = new Array(15);
 		for (var i = 0; i < 15; i++) {
@@ -254,7 +274,7 @@ async function moveStones(element) {
 			for (i = 0; i < board[spot].length; i++) {
 				if (board[spot][i] == "" || board[spot][i] == null) {
 					board[spot][i] = toMove[j];
-					document.getElementById(element.id + "." + j).style.transform = "translate(" + (61 * (spot - element.id)) + "px, 30px)";
+					document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, i);
 					i = board[spot].length;
 				}
 			}
