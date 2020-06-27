@@ -241,6 +241,8 @@ function setDifficulty(howHard) {
 async function moveStones(element) {
 	
 	function getTransform(oldPit, newPit, oldIndex, newIndex) {
+		// Middle caches are different
+		// We need to handle the opposite direction for the top of the board
 
 		function getYOffset(index) {
 			if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
@@ -251,12 +253,22 @@ async function moveStones(element) {
 		}
 
 		let xOffset, yOffset = 0;
-		xOffset = 61 * (newPit - oldPit);
-		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+
+		if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 7 && newPit <= 12)) { // Have to deal with a turn
+			xOffset = 61 * (oldPit - 5);
+			xOffset -= 61 * (12 - newPit)
+			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 0 && newPit <= 5)) { // Turn starting from 2nd player
+			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		} else { // All on the same side
+			xOffset = 61 * (newPit - oldPit);
+			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		}
 		
+
 		yOffset = getYOffset(oldIndex) - getYOffset(newIndex);
 
-		return "translate(" + xOffset + "px, " + yOffset + "px)"
+		return "translate(" + xOffset + "px, " + yOffset + "px)";
 	}
 	
 	if((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
@@ -280,7 +292,7 @@ async function moveStones(element) {
 				}
 			}
 
-			await new Promise(r => setTimeout(r, 300));
+			await new Promise(r => setTimeout(r, 400));
 		}
 		if (spot == 6 && user[0] || spot == 13 && !user[0])
 			switchUser();
