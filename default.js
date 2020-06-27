@@ -248,25 +248,52 @@ async function moveStones(element) {
 			if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
 				return Math.floor(index / 2) * 7.5;
 			} else if (Math.ceil(index / 2) % 2 == 1) { // Down/Positive
-				return 0 - (Math.floor(index / 2) + 1) * 7.5
+				return 0 - Math.floor(index / 2) * 7.5
+			}
+		}
+
+		function getCacheYOffset(index) {
+			if ((Math.floor(index / 3) % 2) == 0) { // Down/Positive
+				return Math.ceil(index / 3) * 7.5;
+			} else { // Up/Negative
+				return 0 - (Math.ceil(index / 3) - 1) * 7.5;
 			}
 		}
 
 		let xOffset, yOffset = 0;
 
 		if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 7 && newPit <= 12)) { // Have to deal with a turn
-			xOffset = 61 * (oldPit - 5);
-			xOffset -= 61 * (12 - newPit)
+			xOffset = 61 * (5 - oldPit);
+			xOffset -= 61 * (newPit - 7)
 			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+			yOffset -= 146;
 		} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 0 && newPit <= 5)) { // Turn starting from 2nd player
+			xOffset =  0 - (61 * (12 - oldPit));
+			xOffset += 61 * newPit; 
 			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
-		} else { // All on the same side
+			yOffset += 146;
+		} else if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 0 && newPit <= 5)) { // All on the bottom side
 			xOffset = 61 * (newPit - oldPit);
 			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 7 && newPit <= 12)) { // All on the top side
+			xOffset = 0 - (61 * (newPit - oldPit));
+			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		} else if (newPit == 6) { // right cache
+			xOffset = 61 * (5 - oldPit) + 61 + (((newIndex + 1) % 3) * 15);
+		} else {// newPit == 13, left cache
+			xOffset = 0 - ((12 - oldPit) - 61 + (((newIndex + 2) % 3) * 15));
 		}
-		
 
-		yOffset = getYOffset(oldIndex) - getYOffset(newIndex);
+		if (newPit == 6 || newPit == 13) { // Caches
+			yOffset += (getYOffset(oldIndex) - getCacheYOffset(newIndex));
+			if (oldPit >= 0 && oldPit <= 5) {
+				yOffset -= 73;
+			} else if (oldPit >= 7 && oldPit <= 12) {
+				yOffset += 73;
+			}
+		} else {
+			yOffset += (getYOffset(oldIndex) - getYOffset(newIndex));
+		}
 
 		return "translate(" + xOffset + "px, " + yOffset + "px)";
 	}
