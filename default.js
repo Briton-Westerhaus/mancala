@@ -248,7 +248,7 @@ async function moveStones(element) {
 			if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
 				return Math.floor(index / 2) * 7.5;
 			} else if (Math.ceil(index / 2) % 2 == 1) { // Down/Positive
-				return 0 - Math.floor(index / 2) * 7.5
+				return 0 - (Math.floor(index / 2) + 1) * 7.5
 			}
 		}
 
@@ -279,9 +279,11 @@ async function moveStones(element) {
 			xOffset = 0 - (61 * (newPit - oldPit));
 			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
 		} else if (newPit == 6) { // right cache
-			xOffset = 61 * (5 - oldPit) + 61 + (((newIndex + 1) % 3) * 15);
+			xOffset = 61 * (5 - oldPit) + 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
+			xOffset += (oldIndex % 2) * 15;
 		} else {// newPit == 13, left cache
-			xOffset = 0 - ((12 - oldPit) - 61 + (((newIndex + 2) % 3) * 15));
+			xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (((newIndex + 2) % 3) * 15));
+			xOffset -= ((oldIndex + 1) % 2) * 15;
 		}
 
 		if (newPit == 6 || newPit == 13) { // Caches
