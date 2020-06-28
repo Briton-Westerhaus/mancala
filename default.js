@@ -253,11 +253,18 @@ async function moveStones(element) {
 		}
 
 		function getCacheYOffset(index) {
-			if ((Math.floor(index / 3) % 2) == 0) { // Down/Positive
-				return Math.ceil(index / 3) * 7.5;
-			} else { // Up/Negative
-				return 0 - (Math.ceil(index / 3) - 1) * 7.5;
+			let yOffset = 0;
+			if ((Math.floor(index / 3) % 2) == 0) { // Up/Negative
+				yOffset += (Math.floor(index / 3) * 7.5);
+			} else { // Down/Postivie
+				yOffset -= (Math.floor(index / 3) + 1) * 7.5;
 			}
+
+			if (index % 3 != 0) {
+				yOffset -= 7.5;
+			}
+
+			return yOffset;
 		}
 
 		let xOffset, yOffset = 0;
@@ -282,7 +289,7 @@ async function moveStones(element) {
 			xOffset = 61 * (5 - oldPit) + 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
 			xOffset += (oldIndex % 2) * 15;
 		} else {// newPit == 13, left cache
-			xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (((newIndex + 2) % 3) * 15));
+			xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (30 - (((newIndex + 1) % 3) * 15)));
 			xOffset -= ((oldIndex + 1) % 2) * 15;
 		}
 
