@@ -238,6 +238,10 @@ function setDifficulty(howHard) {
 	document.getElementById("game").style.visibility = "visible";
 }
 
+async function animateMove() {
+	
+}
+
 async function moveStones(element) {
 	
 	function getTransform(oldPit, newPit, oldIndex, newIndex) {
@@ -307,7 +311,7 @@ async function moveStones(element) {
 		return "translate(" + xOffset + "px, " + yOffset + "px)";
 	}
 	
-	if((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
+	if ((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
 		var toMove = new Array(15);
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[element.id][i];
@@ -468,54 +472,52 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		toMove[i] = thisBoard[moveSquare][i];
 		thisBoard[moveSquare][i] = "";
 	}
-	var j = 0;
 	var i;
-	if((user[0] && realUser) || (!realUser && tempUser[0])){
-		while(toMove[j] != "" && toMove[j] != null){
+	if ((user[0] && realUser) || (!realUser && tempUser[0])) {
+		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
-			for(i = 0; i < thisBoard[moveSquare].length; i++){
-				if(thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null){
+			for (i = 0; i < thisBoard[moveSquare].length; i++) {
+				if (thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null) {
 					thisBoard[moveSquare][i] = toMove[j];
 					i = board[moveSquare].length;
 				}
 			}
-			j++;
 		}
-		if(moveSquare == 13){
+		if (moveSquare == 13) {
 			if(realUser)
 				user[0] = !user[0];
 			else
 				tempUser[0] = !tempUser[0];
 		}
-		if(moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")){
+		if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
 			for(var i = 0; i < 15; i++){
 				toMove[i] = thisBoard[12 - moveSquare][i];
 				thisBoard[12 - moveSquare][i] = "";
 			}
 			var j = 0;
-			for(i = 0; i < thisBoard[13].length; i++){
-				if(thisBoard[13][i] == "" || thisBoard[13][i] == null){
-					if(thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != ""){
+			for (i = 0; i < thisBoard[13].length; i++) {
+				if (thisBoard[13][i] == "" || thisBoard[13][i] == null) {
+					if (thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != "") {
 						thisBoard[13][i] = thisBoard[moveSquare][0];
 						thisBoard[moveSquare][0] = "";
 						i++;
 					}
 					thisBoard[13][i] = toMove[j];
 					j++;
-					if(toMove[j] == null || toMove[j] == "")
+					if (toMove[j] == null || toMove[j] == "")
 						i = thisBoard[13].length;
 				}
 			}
 		}
 		return;
 	}
-	while(toMove[j] != "" && toMove[j] != null){
+	while (toMove[j] != "" && toMove[j] != null) {
 		moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		for(i = 0; i < thisBoard[moveSquare].length; i++){
+		for (i = 0; i < thisBoard[moveSquare].length; i++) {
 			if(thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null){
 				thisBoard[moveSquare][i] = toMove[j];
 				i = board[moveSquare].length;
@@ -523,20 +525,20 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		}
 		j++;
 	}
-	if(moveSquare == 6){
+	if (moveSquare == 6) {
 		if(realUser)
 			user[0] = !user[0];
 		else
 			tempUser[0] = !tempUser[0];
 		}
-		if(moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")){
+		if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
 		for(var i = 0; i < 15; i++){
 			toMove[i] = thisBoard[12 - moveSquare][i];
 			thisBoard[12 - moveSquare][i] = "";
 		}
 		var j = 0;
-		for(i = 0; i < thisBoard[6].length; i++){
-			if(thisBoard[6][i] == "" || thisBoard[6][i] == null){
+		for (i = 0; i < thisBoard[6].length; i++) {
+			if (thisBoard[6][i] == "" || thisBoard[6][i] == null) {
 				if(thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != ""){
 					thisBoard[6][i] = thisBoard[moveSquare][0];
 					thisBoard[moveSquare][0] = "";
@@ -544,7 +546,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 				}
 				thisBoard[6][i] = toMove[j];
 				j++;
-				if(toMove[j] == null || toMove[j] == "")
+				if (toMove[j] == null || toMove[j] == "")
 					i = thisBoard[6].length;
 			}
 		}
