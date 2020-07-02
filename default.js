@@ -319,18 +319,16 @@ async function moveStones(element) {
 		}
 		var i;
 		var spot = element.id;
+		let testIndex;
 
 		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			spot++;
 			if (spot > 13)
 				spot = 0;
-			for (i = 0; i < board[spot].length; i++) {
-				if (board[spot][i] == "" || board[spot][i] == null) {
-					board[spot][i] = toMove[j];
-					document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, i);
-					i = board[spot].length;
-				}
-			}
+			
+			emptyIndex = board[spot].findIndex(function(stone) { return !stone; });
+			board[spot][emptyIndex] = toMove[j];
+			document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
 
 			await new Promise(r => setTimeout(r, 400));
 		}
