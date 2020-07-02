@@ -319,7 +319,7 @@ async function moveStones(element) {
 		}
 		var i;
 		var spot = element.id;
-		let testIndex;
+		let emptyIndex;
 
 		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			spot++;
