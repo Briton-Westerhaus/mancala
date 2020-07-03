@@ -525,13 +525,13 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		j++;
 	}
 	if (moveSquare == 6) {
-		if(realUser)
+		if (realUser)
 			user = !user;
 		else
 			tempUser = !tempUser;
-		}
-		if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-		for(var i = 0; i < 15; i++){
+	}
+	if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+		for(var i = 0; i < 15; i++) {
 			toMove[i] = thisBoard[12 - moveSquare][i];
 			thisBoard[12 - moveSquare][i] = "";
 		}
