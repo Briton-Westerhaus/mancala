@@ -2,21 +2,27 @@ var board = new Array(14);
 var user = true; // player one
 var players;
 var difficulty;
-var scores =  Array(2);
-scores[0] = 0;
-scores[1] = 0;
+var scores =  [0, 0];
 var names = Array(2);
 
+/**
+ * Shows the help modal.
+ */
 function showModal() {
     document.getElementById("ModalContainer").style.display = "block";  
 }
 
+/**
+ * Hides the help modal.
+ */
 function hideModal() {
     document.getElementById("ModalContainer").style.display = "None";
 }
 
+/**
+ * Sets all the variables for the game then places the stones on the board with the drawBoard() function.
+ */
 function initializeboard() {
-//sets all the variables for the game then places the stones on the board with the drawBoard() function
 	var temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").className = 'currentPlayer';
@@ -71,8 +77,10 @@ function initializeboard() {
 	drawBoard();
 }
 
+/**
+ * Places or removes stones from the board
+ */
 function drawBoard() {
-	// places or removes stones from the board
 	for (var i = 0; i < 14; i++) {
 		for (var j = 0; j < board[i].length; j++) {
 			if (board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow") {
@@ -85,6 +93,10 @@ function drawBoard() {
 	}
 }
 
+/**
+ * Handles a human turn.
+ * @param {Element} element - The pit or cache clicked by the user.
+ */
 function humanTurn(element){
 	//this is called when a player clicks on a board square
 	if (board[element.id][0] == null || board[element.id][0] == "") {
@@ -93,14 +105,14 @@ function humanTurn(element){
 	moveStones(element);
 }
 
+/**
+ * Executes the computer turn.
+ */
 function computerTurn() {
-	var tempUser = user;
 	var maxMoveVal;
 	var moveVal;
-	var move;
 	var maxMove;
 	var empty;
-	var choice;
 	user = !user;
 	while (user) {
 		drawBoard();
@@ -134,8 +146,15 @@ function computerTurn() {
 	switchUser();
 }
 
+/**
+ * A recursive helper function used to determine optimal computer moves.
+ * @param {Array.<Array.<String>>} tempBoard - A temporary board used to determine future moves.
+ * @param {Number} move - Index of the pit used for the move.
+ * @param {Number} level - The depth of the recursion.
+ * @param {Boolean} temporUser - The temporary user: true is player one, false is player two.
+ */
 function computerTurnRecurse(tempBoard, move, level, temporUser) {
-	var tempUser =!temporUser;
+	var tempUser = !temporUser;
 	var maxMoveVal = 36;
 	var moveVal = 36;
 	var maxMove;
@@ -188,11 +207,19 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 	return maxMoveVal;
 }
 
+/**
+ * Gets the number of stones in a pit/cache given a board.
+ * @param {Array.<Array.Array.<String>} theBoard - A matrix denoting the color of stones on the board. 
+ * @param {Number} elemNum - The number denoting the slot of the pit or cache. 
+ */
 function getNumStones(theBoard, elemNum) {
 	for(var i = 0; theBoard[elemNum][i] != null && theBoard[elemNum][i] != ""; i++);
 	return i;
 }
 
+/**
+ * Actually switches the user once their turn is done.
+ */
 function switchUser() {
 	user = !user;
 	if (user) {
@@ -210,6 +237,10 @@ function switchUser() {
 
 }
 
+/**
+ * Sets the number of players, and names for the game, then advances to the difficulty selection or the game.
+ * @param {number} howMany - The number of players (1 or 2).
+ */
 function setPlayers(howMany) {
 	players = howMany;
 	document.getElementById("startgame").innerHTML = "";
@@ -231,6 +262,10 @@ function setPlayers(howMany) {
 	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
 }
 
+/**
+ * Sets the difficulty of the AI opponent, then advances to the game. 
+ * @param {number} howHard - The difficulty of the AI opponenent.  
+ */
 function setDifficulty(howHard) {
 	difficulty = howHard;
 	document.getElementById("difficulty").style.visiblity = "hidden";
