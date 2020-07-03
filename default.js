@@ -1,5 +1,5 @@
 var board = new Array(14);
-var user = new Array(true);
+var user = true; // player one
 var players;
 var difficulty;
 var scores =  Array(2);
@@ -94,22 +94,22 @@ function humanTurn(element){
 }
 
 function computerTurn() {
-	var tempUser = Array(user.slice(0));
+	var tempUser = user;
 	var maxMoveVal;
 	var moveVal;
 	var move;
 	var maxMove;
 	var empty;
 	var choice;
-	user[0] = !user[0];
-	while (user[0]) {
+	user = !user;
+	while (user) {
 		drawBoard();
 		maxMoveVal = -37;
 		moveVal = -37;
 		for (var i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = computerTurnRecurse(copyBoard(board), i, 0, !user[0]);
-				if(moveVal > maxMoveVal){
+				moveVal = computerTurnRecurse(copyBoard(board), i, 0, !user);
+				if (moveVal > maxMoveVal) {
 					maxMoveVal = moveVal;
 					maxMove = i;
 				}
@@ -118,13 +118,13 @@ function computerTurn() {
 		}
 		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
 		computerMove(board, maxMove, user, true);
-		user[0] = !user[0];
-		empty = isEmpty(board, !user[0]);
+		user = !user;
+		empty = isEmpty(board, !user);
 		if (empty) {
 			if (getNumStones(board, 13) + getNumStones(board, 6) == 36) {
 				return;
 			} else {
-				user[0] = !user[0];
+				user = !user;
 				//setTimeout("computerTurn();", 12);
 				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
@@ -135,18 +135,18 @@ function computerTurn() {
 }
 
 function computerTurnRecurse(tempBoard, move, level, temporUser) {
-	var tempUser = Array(!temporUser);
+	var tempUser =!temporUser;
 	var maxMoveVal = 36;
 	var moveVal = 36;
 	var maxMove;
 	var otherMaxMove;
 	var empty = isEmpty(tempBoard, !temporUser);
 	if (empty)
-		tempUser[0] = !tempUser[0];
+		tempUser = !tempUser;
 	empty = (empty && isEmpty(tempBoard, temporUser));
 	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
 		computerMove(tempBoard, move, tempUser, false);
-		temporUser = tempUser[0];
+		temporUser = tempUser;
 		if (temporUser) {
 			for (var i = 0; i < 6; i++) {
 				if (level==difficulty || empty) {
@@ -194,14 +194,14 @@ function getNumStones(theBoard, elemNum) {
 }
 
 function switchUser() {
-	user[0] = !user[0];
-	if (user[0]) {
+	user = !user;
+	if (user) {
 		document.getElementById("player1").className = "currentPlayer";
 		document.getElementById("player2").className = "";
 		document.getElementById("playerone").style.visibility="visible";
 		document.getElementById("playertwo").style.visibility="hidden";
 	}
-	if (!user[0]) {
+	if (!user) {
 		document.getElementById("player2").className = "currentPlayer";
 		document.getElementById("player1").className = "";
 		document.getElementById("playertwo").style.visibility="visible";
@@ -326,9 +326,10 @@ async function animateMove(element) {
 
 		await new Promise(r => setTimeout(r, 400));
 	}
-	if (spot == 6 && user[0] || spot == 13 && !user[0])
+
+	if (spot == 6 && user || spot == 13 && !user)
 		switchUser();
-	if (user[0] == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
 			board[12 - spot][i] = "";
@@ -348,7 +349,7 @@ async function animateMove(element) {
 			}
 		}
 	}
-	if (user[0] == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
 			board[12 - spot][i] = "";
@@ -372,7 +373,7 @@ async function animateMove(element) {
 
 async function moveStones(element) {
 	
-	if ((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
+	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
 		await animateMove(element);
 		switchUser();
 		drawBoard();
@@ -403,23 +404,23 @@ async function moveStones(element) {
 			window.location.reload();
 	} else {
 		var empty;
-		if (user[0]) {
-			empty = isEmpty(board, user[0]);
+		if (user) {
+			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
 				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
 			}
 		}
 
-		if (!user[0]) {
-			empty = isEmpty(board, user[0]);
+		if (!user) {
+			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
 				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
 			}
 		}
 		
-		if (players == 1 && !user[0]) {
+		if (players == 1 && !user) {
 			drawBoard();
 			computerTurn();
 			scores[0] = 0;
@@ -445,15 +446,15 @@ async function moveStones(element) {
 				if(newOne)
 					window.location.reload();
 			} else {
-				if (user[0]) {
-					empty = isEmpty(board, user[0]);
+				if (user) {
+					empty = isEmpty(board, user);
 					if(empty){
 						switchUser();
 						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
 					}
 				}
-				if (!user[0]) {
-					empty = isEmpty(board, user[0]);
+				if (!user) {
+					empty = isEmpty(board, user);
 					if (empty) {
 						switchUser();
 						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
@@ -471,7 +472,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		thisBoard[moveSquare][i] = "";
 	}
 	var i;
-	if ((user[0] && realUser) || (!realUser && tempUser[0])) {
+	if ((user && realUser) || (!realUser && tempUser)) {
 		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			moveSquare++;
 			if(moveSquare > 13)
@@ -485,9 +486,9 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		}
 		if (moveSquare == 13) {
 			if(realUser)
-				user[0] = !user[0];
+				user = !user;
 			else
-				tempUser[0] = !tempUser[0];
+				tempUser = !tempUser;
 		}
 		if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
 			for(var i = 0; i < 15; i++){
@@ -525,9 +526,9 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	}
 	if (moveSquare == 6) {
 		if(realUser)
-			user[0] = !user[0];
+			user = !user;
 		else
-			tempUser[0] = !tempUser[0];
+			tempUser = !tempUser;
 		}
 		if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
 		for(var i = 0; i < 15; i++){
