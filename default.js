@@ -238,142 +238,142 @@ function setDifficulty(howHard) {
 	document.getElementById("game").style.visibility = "visible";
 }
 
-async function animateMove() {
-	
+function getTransform(oldPit, newPit, oldIndex, newIndex) {
+	// Middle caches are different
+	// We need to handle the opposite direction for the top of the board
+
+	function getYOffset(index) {
+		if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
+			return Math.floor(index / 2) * 7.5;
+		} else if (Math.ceil(index / 2) % 2 == 1) { // Down/Positive
+			return 0 - (Math.floor(index / 2) + 1) * 7.5
+		}
+	}
+
+	function getCacheYOffset(index) {
+		let yOffset = 0;
+		if ((Math.floor(index / 3) % 2) == 0) { // Up/Negative
+			yOffset += (Math.floor(index / 3) * 7.5);
+		} else { // Down/Postivie
+			yOffset -= (Math.floor(index / 3) + 1) * 7.5;
+		}
+
+		if (index % 3 != 0) {
+			yOffset -= 7.5;
+		}
+
+		return yOffset;
+	}
+
+	let xOffset, yOffset = 0;
+
+	if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 7 && newPit <= 12)) { // Have to deal with a turn
+		xOffset = 61 * (5 - oldPit);
+		xOffset -= 61 * (newPit - 7)
+		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		yOffset -= 146;
+	} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 0 && newPit <= 5)) { // Turn starting from 2nd player
+		xOffset =  0 - (61 * (12 - oldPit));
+		xOffset += 61 * newPit; 
+		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+		yOffset += 146;
+	} else if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 0 && newPit <= 5)) { // All on the bottom side
+		xOffset = 61 * (newPit - oldPit);
+		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+	} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 7 && newPit <= 12)) { // All on the top side
+		xOffset = 0 - (61 * (newPit - oldPit));
+		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
+	} else if (newPit == 6) { // right cache
+		xOffset = 61 * (5 - oldPit) + 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
+		xOffset += (oldIndex % 2) * 15;
+	} else {// newPit == 13, left cache
+		xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (30 - (((newIndex + 1) % 3) * 15)));
+		xOffset -= ((oldIndex + 1) % 2) * 15;
+	}
+
+	if (newPit == 6 || newPit == 13) { // Caches
+		yOffset += (getYOffset(oldIndex) - getCacheYOffset(newIndex));
+		if (oldPit >= 0 && oldPit <= 5) {
+			yOffset -= 73;
+		} else if (oldPit >= 7 && oldPit <= 12) {
+			yOffset += 73;
+		}
+	} else {
+		yOffset += (getYOffset(oldIndex) - getYOffset(newIndex));
+	}
+
+	return "translate(" + xOffset + "px, " + yOffset + "px)";
+}
+
+async function animateMove(element) {
+	var toMove = new Array(15);
+	for (var i = 0; i < 15; i++) {
+		toMove[i] = board[element.id][i];
+		board[element.id][i] = "";
+	}
+	var i;
+	var spot = element.id;
+	let emptyIndex;
+
+	for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+		spot++;
+		if (spot > 13)
+			spot = 0;
+		
+		emptyIndex = board[spot].findIndex(function(stone) { return !stone; });
+		board[spot][emptyIndex] = toMove[j];
+		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
+
+		await new Promise(r => setTimeout(r, 400));
+	}
+	if (spot == 6 && user[0] || spot == 13 && !user[0])
+		switchUser();
+	if (user[0] == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+		for (var i = 0; i < 15; i++) {
+			toMove[i] = board[12 - spot][i];
+			board[12 - spot][i] = "";
+		}
+		var j = 0;
+		for (i = 0; i < board[6].length; i++) {
+			if (board[6][i] == "" || board[6][i] == null) {
+				if (board[spot][0] != null && board[spot][0] != "") {
+					board[6][i] = board[spot][0];
+					board[spot][0] = "";
+					i++;
+				}
+				board[6][i] = toMove[j];
+				j++;
+				if(toMove[j] == null || toMove[j] == "")
+					i = board[6].length;
+			}
+		}
+	}
+	if (user[0] == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
+		for (var i = 0; i < 15; i++) {
+			toMove[i] = board[12 - spot][i];
+			board[12 - spot][i] = "";
+		}
+		var j = 0;
+		for (i = 0; i < board[13].length; i++) {
+			if (board[13][i] == "" || board[13][i] == null) {
+				if (board[spot][0] != null && board[spot][0] != "") {
+					board[13][i] = board[spot][0];
+					board[spot][0] = "";
+					i++;
+				}
+				board[13][i] = toMove[j];
+				j++;
+				if (toMove[j] == null || toMove[j] == "")
+					i = board[13].length;
+			}
+		}
+	}
 }
 
 async function moveStones(element) {
 	
-	function getTransform(oldPit, newPit, oldIndex, newIndex) {
-		// Middle caches are different
-		// We need to handle the opposite direction for the top of the board
-
-		function getYOffset(index) {
-			if (Math.ceil(index / 2) % 2 == 0) { // Up/negative
-				return Math.floor(index / 2) * 7.5;
-			} else if (Math.ceil(index / 2) % 2 == 1) { // Down/Positive
-				return 0 - (Math.floor(index / 2) + 1) * 7.5
-			}
-		}
-
-		function getCacheYOffset(index) {
-			let yOffset = 0;
-			if ((Math.floor(index / 3) % 2) == 0) { // Up/Negative
-				yOffset += (Math.floor(index / 3) * 7.5);
-			} else { // Down/Postivie
-				yOffset -= (Math.floor(index / 3) + 1) * 7.5;
-			}
-
-			if (index % 3 != 0) {
-				yOffset -= 7.5;
-			}
-
-			return yOffset;
-		}
-
-		let xOffset, yOffset = 0;
-
-		if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 7 && newPit <= 12)) { // Have to deal with a turn
-			xOffset = 61 * (5 - oldPit);
-			xOffset -= 61 * (newPit - 7)
-			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
-			yOffset -= 146;
-		} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 0 && newPit <= 5)) { // Turn starting from 2nd player
-			xOffset =  0 - (61 * (12 - oldPit));
-			xOffset += 61 * newPit; 
-			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
-			yOffset += 146;
-		} else if ((oldPit >= 0 && oldPit <= 5) && (newPit >= 0 && newPit <= 5)) { // All on the bottom side
-			xOffset = 61 * (newPit - oldPit);
-			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
-		} else if ((oldPit >= 7 && oldPit <= 12) && (newPit >= 7 && newPit <= 12)) { // All on the top side
-			xOffset = 0 - (61 * (newPit - oldPit));
-			xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
-		} else if (newPit == 6) { // right cache
-			xOffset = 61 * (5 - oldPit) + 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
-			xOffset += (oldIndex % 2) * 15;
-		} else {// newPit == 13, left cache
-			xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (30 - (((newIndex + 1) % 3) * 15)));
-			xOffset -= ((oldIndex + 1) % 2) * 15;
-		}
-
-		if (newPit == 6 || newPit == 13) { // Caches
-			yOffset += (getYOffset(oldIndex) - getCacheYOffset(newIndex));
-			if (oldPit >= 0 && oldPit <= 5) {
-				yOffset -= 73;
-			} else if (oldPit >= 7 && oldPit <= 12) {
-				yOffset += 73;
-			}
-		} else {
-			yOffset += (getYOffset(oldIndex) - getYOffset(newIndex));
-		}
-
-		return "translate(" + xOffset + "px, " + yOffset + "px)";
-	}
-	
 	if ((user[0] == true && element.id < 6) || (user[0] == false && element.id > 6 && element.id != 13)) {
-		var toMove = new Array(15);
-		for (var i = 0; i < 15; i++) {
-			toMove[i] = board[element.id][i];
-			board[element.id][i] = "";
-		}
-		var i;
-		var spot = element.id;
-		let emptyIndex;
-
-		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
-			spot++;
-			if (spot > 13)
-				spot = 0;
-			
-			emptyIndex = board[spot].findIndex(function(stone) { return !stone; });
-			board[spot][emptyIndex] = toMove[j];
-			document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
-
-			await new Promise(r => setTimeout(r, 400));
-		}
-		if (spot == 6 && user[0] || spot == 13 && !user[0])
-			switchUser();
-		if (user[0] == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
-			for (var i = 0; i < 15; i++) {
-				toMove[i] = board[12 - spot][i];
-				board[12 - spot][i] = "";
-			}
-			var j = 0;
-			for (i = 0; i < board[6].length; i++) {
-				if (board[6][i] == "" || board[6][i] == null) {
-					if (board[spot][0] != null && board[spot][0] != "") {
-						board[6][i] = board[spot][0];
-						board[spot][0] = "";
-						i++;
-					}
-					board[6][i] = toMove[j];
-					j++;
-					if(toMove[j] == null || toMove[j] == "")
-						i = board[6].length;
-				}
-			}
-		}
-		if (user[0] == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
-			for (var i = 0; i < 15; i++) {
-				toMove[i] = board[12 - spot][i];
-				board[12 - spot][i] = "";
-			}
-			var j = 0;
-			for (i = 0; i < board[13].length; i++) {
-				if (board[13][i] == "" || board[13][i] == null) {
-					if (board[spot][0] != null && board[spot][0] != "") {
-						board[13][i] = board[spot][0];
-						board[spot][0] = "";
-						i++;
-					}
-					board[13][i] = toMove[j];
-					j++;
-					if (toMove[j] == null || toMove[j] == "")
-						i = board[13].length;
-				}
-			}
-		}
+		await animateMove(element);
 		switchUser();
 		drawBoard();
 	} else {
