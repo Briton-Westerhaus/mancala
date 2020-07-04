@@ -168,7 +168,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 		temporUser = tempUser;
 		if (temporUser) {
 			for (var i = 0; i < 6; i++) {
-				if (level==difficulty || empty) {
+				if (level == difficulty || empty) {
 					return (getNumStones(tempBoard, 13) - getNumStones(tempBoard, 6));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
@@ -185,7 +185,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 			maxMoveVal = -36;
 			moveVal = -36;
 			for (var i = 7; i < 13; i++) {
-				if (level==difficulty || empty) {
+				if (level == difficulty || empty) {
 					return (getNumStones(tempBoard, 13) - getNumStones(tempBoard, 6));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
@@ -213,8 +213,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
  * @param {Number} elemNum - The number denoting the slot of the pit or cache. 
  */
 function getNumStones(theBoard, elemNum) {
-	for(var i = 0; theBoard[elemNum][i] != null && theBoard[elemNum][i] != ""; i++);
-	return i;
+	return theBoard[elemNum].findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -264,7 +263,7 @@ function setPlayers(howMany) {
 
 /**
  * Sets the difficulty of the AI opponent, then advances to the game. 
- * @param {number} howHard - The difficulty of the AI opponenent.  
+ * @param {number} howHard - The difficulty of the AI opponenent.
  */
 function setDifficulty(howHard) {
 	difficulty = howHard;
@@ -355,7 +354,7 @@ async function animateMove(element) {
 		if (spot > 13)
 			spot = 0;
 		
-		emptyIndex = board[spot].findIndex(function(stone) { return !stone; });
+		emptyIndex = getNumStones(board, spot); // The number of stones also indicates the first empty slot.
 		board[spot][emptyIndex] = toMove[j];
 		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
 
