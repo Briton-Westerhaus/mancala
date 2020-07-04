@@ -272,6 +272,13 @@ function setDifficulty(howHard) {
 	document.getElementById("game").style.visibility = "visible";
 }
 
+/**
+ * Gets the transform animation to apply to the stone as it moves. 
+ * @param {Number} oldPit - The index of the pit to start the animation.  
+ * @param {Number} newPit - The index of the pit to end the animation.
+ * @param {Number} oldIndex - The slot of the stone to start the animation.
+ * @param {Number} newIndex - The slot of the stone to end the animation.
+ */
 function getTransform(oldPit, newPit, oldIndex, newIndex) {
 	// Middle caches are different
 	// We need to handle the opposite direction for the top of the board
@@ -339,6 +346,10 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
 	return "translate(" + xOffset + "px, " + yOffset + "px)";
 }
 
+/**
+ * Animates moving the stones from a pit.
+ * @param {Element} element - The pit of the move to animate.
+ */
 async function animateMove(element) {
 	var toMove = new Array(15);
 	for (var i = 0; i < 15; i++) {
@@ -405,6 +416,10 @@ async function animateMove(element) {
 	}
 }
 
+/**
+ * Handles a move and calculates the end of a game. 
+ * @param {Element} element - The pit of the move.
+ */
 async function moveStones(element) {
 	
 	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
@@ -499,6 +514,13 @@ async function moveStones(element) {
 	}
 }
 
+/**
+ * 
+ * @param {Array.<Array.<String>>} thisBoard - The board used for the computer move.
+ * @param {Number} moveSquare - The pit of the move.
+ * @param {Boolean} tempUser - The active player, true for player one.
+ * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
+ */
 function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	var toMove = new Array(15);
 	for(var i = 0; i < 15; i++){
@@ -586,6 +608,10 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	}
 }
 
+/**
+ * Clones the board to use in other calculations.
+ * @param {Array.<Array.<String>>} theBoard 
+ */
 function copyBoard(theBoard) {
 	var returnBoard = Array(theBoard.length);
 	for (var i = 0; i < theBoard.length; i++){
@@ -594,6 +620,11 @@ function copyBoard(theBoard) {
 	return returnBoard;
 }
 
+/**
+ * Checks if a player's side of the board is empty.
+ * @param {Array.<Array.<String>>} theBoard 
+ * @param {Boolean} theUser - The active player, true for player one.
+ */
 function isEmpty(theBoard, theUser) {
 	var i = 0;
 	var max = 6;
