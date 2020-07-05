@@ -350,7 +350,7 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
  * @param {Element} element - The pit of the move to animate.
  */
 async function animateMove(element) {
-	// Copy stones to temporary array.
+	// Move stones to temporary array.
 	var toMove = new Array(15);
 	for (let i = 0; i < 15; i++) {
 		toMove[i] = board[element.id][i];
@@ -535,56 +535,55 @@ async function moveStones(element) {
  * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
  */
 function computerMove(thisBoard, moveSquare, tempUser, realUser) {
-	// Copy stones to temporary array.
+	// Move stones to temporary array.
 	var toMove = new Array(15);
-	for(let i = 0; i < 15; i++){
+	for (let i = 0; i < 15; i++) {
 		toMove[i] = thisBoard[moveSquare][i];
 		thisBoard[moveSquare][i] = "";
 	}
-
-	let emptyIndex;
+	
 	if ((user && realUser) || (!realUser && tempUser)) {
+		// Move the stones.
+		let emptyIndex;
 		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
 			
 			emptyIndex = getNumStones(thisBoard[moveSquare]);
-			for (let i = 0; i < thisBoard[moveSquare].length; i++) {
-				if (thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null) {
-					thisBoard[moveSquare][i] = toMove[j];
-					i = board[moveSquare].length;
-				}
-			}
+			thisBoard[moveSquare][emptyIndex] = toMove[j];
 		}
+		// Computer ended in their cache. They have another turn. 
 		if (moveSquare == 13) {
 			if(realUser)
 				user = !user;
 			else
 				tempUser = !tempUser;
-		}
-		if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			for(let i = 0; i < 15; i++){
+
+		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
+		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+			
+			let emptyIndex;
+
+			// Move stones to temporary array. 
+			for (let i = 0; i < 15; i++) {
 				toMove[i] = thisBoard[12 - moveSquare][i];
 				thisBoard[12 - moveSquare][i] = "";
 			}
-			var j = 0;
-			for (let i = 0; i < thisBoard[13].length; i++) {
-				if (thisBoard[13][i] == "" || thisBoard[13][i] == null) {
-					if (thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != "") {
-						thisBoard[13][i] = thisBoard[moveSquare][0];
-						thisBoard[moveSquare][0] = "";
-						i++;
-					}
-					thisBoard[13][i] = toMove[j];
-					j++;
-					if (toMove[j] == null || toMove[j] == "")
-						i = thisBoard[13].length;
-				}
+			emptyIndex = getNumStones(thisBoard[13]);
+			
+			// Move the last moved stone to the cache.
+			thisBoard[13][emptyIndex] = thisBoard[moveSquare][0]
+			emptyIndex++;
+
+			// Do the actual moving.
+			for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
+				thisBoard[13][emptyIndex] = toMove[i];
 			}
 		}
 		return;
 	}
+	// This is when we're simulating a player turn during recursion. 
 	while (toMove[j] != "" && toMove[j] != null) {
 		moveSquare++;
 		if(moveSquare > 13)
