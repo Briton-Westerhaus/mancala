@@ -133,7 +133,7 @@ function computerTurn() {
 		user = !user;
 		empty = isEmpty(board, !user);
 		if (empty) {
-			if (getNumStones(board, 13) + getNumStones(board, 6) == 36) {
+			if (getNumStones(board[13]) + getNumStones(board[6]) == 36) {
 				return;
 			} else {
 				user = !user;
@@ -169,7 +169,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 		if (temporUser) {
 			for (var i = 0; i < 6; i++) {
 				if (level == difficulty || empty) {
-					return (getNumStones(tempBoard, 13) - getNumStones(tempBoard, 6));
+					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
 					moveVal = computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
@@ -186,7 +186,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 			moveVal = -36;
 			for (var i = 7; i < 13; i++) {
 				if (level == difficulty || empty) {
-					return (getNumStones(tempBoard, 13) - getNumStones(tempBoard, 6));
+					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
 					moveVal = computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
@@ -209,11 +209,10 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 
 /**
  * Gets the number of stones in a pit/cache given a board.
- * @param {Array.<Array.Array.<String>} theBoard - A matrix denoting the color of stones on the board. 
- * @param {Number} elemNum - The number denoting the slot of the pit or cache. 
+ * @param {Array.<String>} theBoard - An array denoting the color of stones in the pit or cache. 
  */
-function getNumStones(theBoard, elemNum) {
-	return theBoard[elemNum].findIndex(function(stone) { return !stone; });
+function getNumStones(pit) {
+	return pit.findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -353,11 +352,11 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
 async function animateMove(element) {
 	// Copy stones to temporary array.
 	var toMove = new Array(15);
-	for (var i = 0; i < 15; i++) {
+	for (let i = 0; i < 15; i++) {
 		toMove[i] = board[element.id][i];
 		board[element.id][i] = "";
 	}
-	var i;
+
 	var spot = element.id;
 	let emptyIndex;
 
@@ -366,7 +365,7 @@ async function animateMove(element) {
 		if (spot > 13)
 			spot = 0;
 		
-		emptyIndex = getNumStones(board, spot); // The number of stones also indicates the first empty slot.
+		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
 		board[spot][emptyIndex] = toMove[j];
 		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
 
@@ -381,7 +380,7 @@ async function animateMove(element) {
 			board[12 - spot][i] = "";
 		}
 		var j = 0;
-		for (i = 0; i < board[6].length; i++) {
+		for (let i = 0; i < board[6].length; i++) {
 			if (board[6][i] == "" || board[6][i] == null) {
 				if (board[spot][0] != null && board[spot][0] != "") {
 					board[6][i] = board[spot][0];
@@ -396,12 +395,12 @@ async function animateMove(element) {
 		}
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		for (var i = 0; i < 15; i++) {
+		for (let i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
 			board[12 - spot][i] = "";
 		}
 		var j = 0;
-		for (i = 0; i < board[13].length; i++) {
+		for (let i = 0; i < board[13].length; i++) {
 			if (board[13][i] == "" || board[13][i] == null) {
 				if (board[spot][0] != null && board[spot][0] != "") {
 					board[13][i] = board[spot][0];
@@ -434,12 +433,12 @@ async function moveStones(element) {
 	scores[0] = 0;
 	scores[1] = 0;
 
-	for (var i = 0; i < 34; i++) {
+	for (let i = 0; i < 34; i++) {
 		if(board[6][i] != null && board[6][i] != "")
 			scores[0]++;
 	}
 
-	for (var i = 0; i < 34; i++) {
+	for (let i = 0; i < 34; i++) {
 		if(board[13][i] != null && board[13][i] != "")
 			scores[1]++;
 	}
@@ -485,11 +484,11 @@ async function moveStones(element) {
 			// Calculate scores
 			scores[0] = 0;
 			scores[1] = 0;
-			for (var i = 0; i < 34; i++) {
+			for (let i = 0; i < 34; i++) {
 				if(board[6][i] != null && board[6][i] != "")
 					scores[0]++;
 			}
-			for (var i = 0; i < 34; i++) {
+			for (let i = 0; i < 34; i++) {
 				if(board[13][i] != null && board[13][i] != "")
 					scores[1]++;
 			}
@@ -538,17 +537,20 @@ async function moveStones(element) {
 function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// Copy stones to temporary array.
 	var toMove = new Array(15);
-	for(var i = 0; i < 15; i++){
+	for(let i = 0; i < 15; i++){
 		toMove[i] = thisBoard[moveSquare][i];
 		thisBoard[moveSquare][i] = "";
 	}
-	var i;
+
+	let emptyIndex;
 	if ((user && realUser) || (!realUser && tempUser)) {
 		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 			moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
-			for (i = 0; i < thisBoard[moveSquare].length; i++) {
+			
+			emptyIndex = getNumStones(thisBoard[moveSquare]);
+			for (let i = 0; i < thisBoard[moveSquare].length; i++) {
 				if (thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null) {
 					thisBoard[moveSquare][i] = toMove[j];
 					i = board[moveSquare].length;
@@ -562,12 +564,12 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 				tempUser = !tempUser;
 		}
 		if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			for(var i = 0; i < 15; i++){
+			for(let i = 0; i < 15; i++){
 				toMove[i] = thisBoard[12 - moveSquare][i];
 				thisBoard[12 - moveSquare][i] = "";
 			}
 			var j = 0;
-			for (i = 0; i < thisBoard[13].length; i++) {
+			for (let i = 0; i < thisBoard[13].length; i++) {
 				if (thisBoard[13][i] == "" || thisBoard[13][i] == null) {
 					if (thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != "") {
 						thisBoard[13][i] = thisBoard[moveSquare][0];
@@ -587,7 +589,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		for (i = 0; i < thisBoard[moveSquare].length; i++) {
+		for (let i = 0; i < thisBoard[moveSquare].length; i++) {
 			if(thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null){
 				thisBoard[moveSquare][i] = toMove[j];
 				i = board[moveSquare].length;
@@ -602,12 +604,12 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			tempUser = !tempUser;
 	}
 	if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-		for(var i = 0; i < 15; i++) {
+		for(let i = 0; i < 15; i++) {
 			toMove[i] = thisBoard[12 - moveSquare][i];
 			thisBoard[12 - moveSquare][i] = "";
 		}
 		var j = 0;
-		for (i = 0; i < thisBoard[6].length; i++) {
+		for (let i = 0; i < thisBoard[6].length; i++) {
 			if (thisBoard[6][i] == "" || thisBoard[6][i] == null) {
 				if(thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != ""){
 					thisBoard[6][i] = thisBoard[moveSquare][0];
