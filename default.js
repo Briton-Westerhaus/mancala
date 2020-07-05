@@ -351,6 +351,7 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
  * @param {Element} element - The pit of the move to animate.
  */
 async function animateMove(element) {
+	// Copy stones to temporary array.
 	var toMove = new Array(15);
 	for (var i = 0; i < 15; i++) {
 		toMove[i] = board[element.id][i];
@@ -429,18 +430,24 @@ async function moveStones(element) {
 	} else {
 		return false;
 	}
+	// Recalculate scores
 	scores[0] = 0;
 	scores[1] = 0;
+
 	for (var i = 0; i < 34; i++) {
 		if(board[6][i] != null && board[6][i] != "")
 			scores[0]++;
 	}
+
 	for (var i = 0; i < 34; i++) {
 		if(board[13][i] != null && board[13][i] != "")
 			scores[1]++;
 	}
+
 	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+	// Check for the end of the game.
 	if (scores[0] + scores[1] == 36) {
 		var newOne;
 		if (scores[0] > scores[1])
@@ -452,6 +459,7 @@ async function moveStones(element) {
 		if (newOne)
 			window.location.reload();
 	} else {
+		// Check whether the turn advances or if the opposite player has no legal moves.
 		var empty;
 		if (user) {
 			empty = isEmpty(board, user);
@@ -469,9 +477,12 @@ async function moveStones(element) {
 			}
 		}
 		
+		// Perform computer move.
 		if (players == 1 && !user) {
 			drawBoard();
 			computerTurn();
+
+			// Calculate scores
 			scores[0] = 0;
 			scores[1] = 0;
 			for (var i = 0; i < 34; i++) {
@@ -484,6 +495,8 @@ async function moveStones(element) {
 			}
 			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+			// Check for the end of the game.
 			if (scores[0] + scores[1] == 36) {
 				var newOne;
 				if(scores[0] > scores[1])
@@ -495,6 +508,7 @@ async function moveStones(element) {
 				if(newOne)
 					window.location.reload();
 			} else {
+				// Check whether the turn advances or if the opposite player has no legal moves.
 				if (user) {
 					empty = isEmpty(board, user);
 					if(empty){
@@ -522,6 +536,7 @@ async function moveStones(element) {
  * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
  */
 function computerMove(thisBoard, moveSquare, tempUser, realUser) {
+	// Copy stones to temporary array.
 	var toMove = new Array(15);
 	for(var i = 0; i < 15; i++){
 		toMove[i] = thisBoard[moveSquare][i];
