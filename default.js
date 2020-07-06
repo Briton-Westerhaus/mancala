@@ -574,6 +574,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			
 			// Move the last moved stone to the cache.
 			thisBoard[13][emptyIndex] = thisBoard[moveSquare][0]
+			thisBoard[moveSquare][0] = "";
 			emptyIndex++;
 
 			// Do the actual moving.
