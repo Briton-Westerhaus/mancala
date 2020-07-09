@@ -590,7 +590,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
+		emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
 		thisBoard[moveSquare][emptyIndex] = toMove[j];
 	}
 	// The final stone ends in the cache, so the player gets another turn. 
