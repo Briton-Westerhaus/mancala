@@ -573,7 +573,7 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			emptyIndex = getNumStones(thisBoard[13]);
 			
 			// Move the last moved stone to the cache.
-			thisBoard[13][emptyIndex] = thisBoard[moveSquare][0]
+			thisBoard[13][emptyIndex] = thisBoard[moveSquare][0];
 			thisBoard[moveSquare][0] = "";
 			emptyIndex++;
 
@@ -585,42 +585,43 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		return;
 	}
 	// This is when we're simulating a player turn during recursion. 
-	while (toMove[j] != "" && toMove[j] != null) {
+	let emptyIndex;
+	for(j = 0; toMove[j] != "" && toMove[j] != null; j++) {
 		moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		for (let i = 0; i < thisBoard[moveSquare].length; i++) {
-			if(thisBoard[moveSquare][i] == "" || thisBoard[moveSquare][i] == null){
-				thisBoard[moveSquare][i] = toMove[j];
-				i = board[moveSquare].length;
-			}
-		}
-		j++;
+		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
+		thisBoard[moveSquare][emptyIndex] = toMove[j];
 	}
+	// The final stone ends in the cache, so the player gets another turn. 
 	if (moveSquare == 6) {
 		if (realUser)
 			user = !user;
 		else
 			tempUser = !tempUser;
 	}
+
+	// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 	if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+
+		let emptyIndex;
+		
+		// Move stones to temporary array. 
 		for(let i = 0; i < 15; i++) {
-			toMove[i] = thisBoard[12 - moveSquare][i];
-			thisBoard[12 - moveSquare][i] = "";
+			toMove[i] = thisBoard[6 + moveSquare][i];
+			thisBoard[6 + moveSquare][i] = "";
 		}
-		var j = 0;
-		for (let i = 0; i < thisBoard[6].length; i++) {
-			if (thisBoard[6][i] == "" || thisBoard[6][i] == null) {
-				if(thisBoard[moveSquare][0] != null && thisBoard[moveSquare][0] != ""){
-					thisBoard[6][i] = thisBoard[moveSquare][0];
-					thisBoard[moveSquare][0] = "";
-					i++;
-				}
-				thisBoard[6][i] = toMove[j];
-				j++;
-				if (toMove[j] == null || toMove[j] == "")
-					i = thisBoard[6].length;
-			}
+
+		emptyIndex = getNumStones(thisBoard[6]);
+			
+		// Move the last moved stone to the cache.
+		thisBoard[6][emptyIndex] = thisBoard[moveSquare][0];
+		thisBoard[moveSquare][0] = "";
+		emptyIndex++;
+
+		// Do the actual moving.
+		for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
+			thisBoard[6][emptyIndex] = toMove[i];
 		}
 	}
 }
