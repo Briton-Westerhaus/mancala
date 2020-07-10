@@ -108,7 +108,7 @@ function humanTurn(element){
 /**
  * Executes the computer turn.
  */
-function computerTurn() {
+async function computerTurn() {
 	var maxMoveVal;
 	var moveVal;
 	var maxMove;
@@ -120,7 +120,7 @@ function computerTurn() {
 		moveVal = -37;
 		for (var i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = computerTurnRecurse(copyBoard(board), i, 0, !user);
+				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user);
 				if (moveVal > maxMoveVal) {
 					maxMoveVal = moveVal;
 					maxMove = i;
@@ -129,7 +129,7 @@ function computerTurn() {
 			}
 		}
 		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
-		computerMove(board, maxMove, user, true);
+		await computerMove(board, maxMove, user, true);
 		user = !user;
 		empty = isEmpty(board, !user);
 		if (empty) {
@@ -153,7 +153,7 @@ function computerTurn() {
  * @param {Number} level - The depth of the recursion.
  * @param {Boolean} temporUser - The temporary user: true is player one, false is player two.
  */
-function computerTurnRecurse(tempBoard, move, level, temporUser) {
+async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 	var tempUser = !temporUser;
 	var maxMoveVal = 36;
 	var moveVal = 36;
@@ -164,7 +164,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 		tempUser = !tempUser;
 	empty = (empty && isEmpty(tempBoard, temporUser));
 	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
-		computerMove(tempBoard, move, tempUser, false);
+		await computerMove(tempBoard, move, tempUser, false);
 		temporUser = tempUser;
 		if (temporUser) {
 			for (var i = 0; i < 6; i++) {
@@ -172,7 +172,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
 					if (moveVal <= maxMoveVal) {
 						otherMaxMove = maxMove;
 						maxMoveVal = moveVal;
@@ -189,7 +189,7 @@ function computerTurnRecurse(tempBoard, move, level, temporUser) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
 					if(moveVal >= maxMoveVal){
 						maxMove = i;
 						maxMoveVal = moveVal;
@@ -372,8 +372,10 @@ async function animateMove(element) {
 		await new Promise(r => setTimeout(r, 400));
 	}
 
+	// Player ended in their cache. They have another turn. 
 	if (spot == 6 && user || spot == 13 && !user)
 		switchUser();
+
 	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
@@ -479,7 +481,7 @@ async function moveStones(element) {
 		// Perform computer move.
 		if (players == 1 && !user) {
 			drawBoard();
-			computerTurn();
+			await computerTurn();
 
 			// Calculate scores
 			scores[0] = 0;
@@ -534,9 +536,12 @@ async function moveStones(element) {
  * @param {Boolean} tempUser - The active player, true for player one.
  * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
  */
-function computerMove(thisBoard, moveSquare, tempUser, realUser) {
+async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
+	const initialMoveSquare = moveSquare;
+	
 	// Move stones to temporary array.
 	var toMove = new Array(15);
+
 	for (let i = 0; i < 15; i++) {
 		toMove[i] = thisBoard[moveSquare][i];
 		thisBoard[moveSquare][i] = "";
@@ -552,6 +557,10 @@ function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			
 			emptyIndex = getNumStones(thisBoard[moveSquare]);
 			thisBoard[moveSquare][emptyIndex] = toMove[j];
+			if (realUser) {
+				document.getElementById(initialMoveSquare + "." + j).style.transform = getTransform(initialMoveSquare, moveSquare, j, emptyIndex);
+				await new Promise(r => setTimeout(r, 400));
+			}
 		}
 		// Computer ended in their cache. They have another turn. 
 		if (moveSquare == 13) {
