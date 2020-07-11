@@ -261,6 +261,32 @@ function setPlayers(howMany) {
 }
 
 /**
+ * Plays audio when a stone is placed on the board
+ * @param {number} numStones - The number of stones. Used to determine which sound is played.
+ */
+function playAudio(numStones) {
+	let audioName, audioElement;
+
+	switch (numStones) {
+		case 1:
+			audioName = "OneStoneSound";
+			break;
+			
+		case 2:
+			audioName = "TwoStonesSound";
+			break;
+
+		default:
+			audioName = "ThreePlusStonesSound";
+			break;
+	}
+
+	audioElement = document.getElementById(audioName);
+	audioElement.muted = false;
+	audioElement.play();
+}
+
+/**
  * Sets the difficulty of the AI opponent, then advances to the game. 
  * @param {number} howHard - The difficulty of the AI opponenent.
  */
@@ -370,6 +396,7 @@ async function animateMove(element) {
 		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
 
 		await new Promise(r => setTimeout(r, 400));
+		playAudio(emptyIndex);
 	}
 
 	// Player ended in their cache. They have another turn. 
@@ -560,6 +587,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			if (realUser) {
 				document.getElementById(initialMoveSquare + "." + j).style.transform = getTransform(initialMoveSquare, moveSquare, j, emptyIndex);
 				await new Promise(r => setTimeout(r, 400));
+				playAudio(emptyIndex);
 			}
 		}
 		// Computer ended in their cache. They have another turn. 
