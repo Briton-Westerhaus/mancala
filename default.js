@@ -268,21 +268,20 @@ function playAudio(numStones) {
 	let audioName, audioElement;
 
 	switch (numStones) {
-		case 1:
-			audioName = "OneStoneSound";
+		case 0:
+			audioName = "one_stone.mp3";
 			break;
 			
-		case 2:
-			audioName = "TwoStonesSound";
+		case 1:
+			audioName = "two_stones.mp3";
 			break;
 
 		default:
-			audioName = "ThreePlusStonesSound";
+			audioName = "three_plus_stones.mp3";
 			break;
 	}
 
-	audioElement = document.getElementById(audioName);
-	audioElement.muted = false;
+	audioElement = new Audio(audioName); 
 	audioElement.play();
 }
 
