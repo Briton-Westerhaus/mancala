@@ -28,7 +28,7 @@ function initializeboard() {
 	document.getElementById("player1").className = 'currentPlayer';
 	for (var i = 0; i < 6; i++) {
 		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
+		for (var j = 0; j < 15; j++) {
 			temp = Math.round(3 * Math.random());
 			switch (temp) {
 				case 0:
@@ -52,7 +52,7 @@ function initializeboard() {
 	board[6] = new Array(34);//right cache
 	for (var i = 7; i < 13; i++) {
 		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
+		for (var j = 0; j < 15; j++) {
 			temp = Math.round(3 * Math.random());
 			switch(temp){
 				case 0:
@@ -349,10 +349,20 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
 		xOffset = 0 - (61 * (newPit - oldPit));
 		xOffset -= ((newIndex % 2) - (oldIndex % 2)) * 15;
 	} else if (newPit == 6) { // right cache
-		xOffset = 61 * (5 - oldPit) + 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
+		if (oldPit >= 0 && oldPit <= 5) { //Starting at the bottom
+			xOffset = 61 * (5 - oldPit);
+		} else { //Starting at the top
+			xOffset = 0 - (61 * (12 - oldPit));
+		}
+		xOffset += 38.5 + 30.5 + (((newIndex + 1) % 3) * 15);
 		xOffset += (oldIndex % 2) * 15;
 	} else {// newPit == 13, left cache
-		xOffset = 0 - (61 * (12 - oldPit) + 38.5 + 30.5 + (30 - (((newIndex + 1) % 3) * 15)));
+		if (oldPit >= 0 && oldPit <= 5) { //Starting at the bottom
+			xOffset = 61 * (5 - oldPit);
+		} else { //Starting at the top
+			xOffset = 0 - (61 * (12 - oldPit));
+		}
+		xOffset += 38.5 + 30.5 + (30 - (((newIndex + 1) % 3) * 15));
 		xOffset -= ((oldIndex + 1) % 2) * 15;
 	}
 
