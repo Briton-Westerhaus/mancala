@@ -51,12 +51,12 @@ td.cache {
 
 table.cache {
 	width: 45px;
-	height: 292px;
+	height: 326px;
 }
 
 .wholeboard {
-	width: 610px;
-	height: 292px;
+	width: 1055px;
+	height: 326px;
 	background-image: url("board.png");
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -64,7 +64,7 @@ table.cache {
 }
 
 .select {
-	height: 292px;
+	height: 326px;
 	width: 90px;
 }
 
@@ -89,7 +89,7 @@ td {
 
 .board {
 	width: 366px;
-	height: 292px;
+	height: 326px;
 }
 
 .square {
@@ -99,8 +99,8 @@ td {
 }
 
 .slot {
-	width: 15px;
-	height: 15px;
+	width: 32px;
+	height: 32px;
 	transition: transform .3s ease;
 	/*transform: translate(61px, 0px);*/
 }
@@ -108,8 +108,8 @@ td {
 .leftcolumn {
 	vertical-align: center;
 	position: relative;
-	left: 15px;
-	width: 15px;
+	left: 32px;
+	width: 32px;
 	height: 105px;
 }
 
@@ -117,25 +117,25 @@ td {
 	vertical-align:center;
 	position:relative;
 	right:0px;
-	width:15px;
+	width:32px;
 	height:120px;
 }
 
 .leftcache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 165px;
 }
 
 .middlecache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 180px;
 }
 
 .rightcache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 165px;
 }
 
