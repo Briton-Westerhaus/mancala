@@ -84,14 +84,19 @@ function initializeBoard() {
 function placeStones(element) {
 	const startX = element.cx.baseVal.value;
 	const startY = element.cy.baseVal.value;
-	const numStones = board[element.id].length;
+	const pit = board[12];
+	const numStones = pit.length;
+	
 	let stones = [];
 	for (let i = 0; i < numStones; i++) {
 		let stone = document.createElement("image");
-		stone.setAttribute("src", board[element.id][i] + "_stone.png");
+		stone.href = pit[i] + "_stone.png";
+		stone.parentElement = document.getElementById("GameBoard");
+		stones.push(stone);
 	}
-	if (numStones == 1) {
-		
+	if (numStones >= 1) {
+		stones[0].x = startX;
+		stones[0].y = startY;
 	}
 }
 

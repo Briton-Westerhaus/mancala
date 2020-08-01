@@ -11,32 +11,32 @@
 	<body>
 		<audio preload muted src="one_stone.mp3" id="OneStoneSound"></audio>
 		<audio preload muted src="two_stones.mp3" id="TwoStonesSound"></audio>
-		<audio  preload muted src="three_plus_stones.mp3" id="ThreePlusStonesSound"></audio>
+		<audio preload muted src="three_plus_stones.mp3" id="ThreePlusStonesSound"></audio>
 		<div class="content">
 			<h2>Mancala</h2>
 			<button class="help" onclick="showModal()">?</button>
 			<div id="startgame">
 				<h3>How many players?</h3>
-				<button onclick="setPlayers(1)">&nbsp&nbsp&nbsp 1 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setPlayers(2)">&nbsp&nbsp&nbsp 2 &nbsp&nbsp&nbsp</button>
+				<button onclick="setPlayers(1)">&nbsp;&nbsp;&nbsp; 1 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setPlayers(2)">&nbsp;&nbsp;&nbsp; 2 &nbsp;&nbsp;&nbsp;</button>
 			</div>
 			<div id="difficulty" style="visibility:hidden">
 				<h3>Choose your difficulty</h3>
-				<button onclick="setDifficulty(1)">&nbsp&nbsp&nbsp 1 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setDifficulty(2)">&nbsp&nbsp&nbsp 2 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setDifficulty(3)">&nbsp&nbsp&nbsp 3 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setDifficulty(4)">&nbsp&nbsp&nbsp 4 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setDifficulty(5)">&nbsp&nbsp&nbsp 5 &nbsp&nbsp&nbsp</button>&nbsp&nbsp&nbsp&nbsp&nbsp
-				<button onclick="setDifficulty(6)">&nbsp&nbsp&nbsp 6 &nbsp&nbsp&nbsp</button>
+				<button onclick="setDifficulty(1)">&nbsp;&nbsp;&nbsp; 1 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setDifficulty(2)">&nbsp;&nbsp;&nbsp; 2 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setDifficulty(3)">&nbsp;&nbsp;&nbsp; 3 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setDifficulty(4)">&nbsp;&nbsp;&nbsp; 4 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setDifficulty(5)">&nbsp;&nbsp;&nbsp; 5 &nbsp;&nbsp;&nbsp;</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<button onclick="setDifficulty(6)">&nbsp;&nbsp;&nbsp; 6 &nbsp;&nbsp;&nbsp;</button>
 			</div>
 			<!--game board-->
 			<div id="game" style="visibility:hidden">
 				<h3 id="player2"></h3>
 				<h3 id="player1"></h3>
 				<div style="font-size: 0px; clear: both;">.</div>
-				<svg class="wholeboard" width="1055"	height="326">
+				<svg class="wholeboard" width="1055" height="326" id="GameBoard">
 					<!-- Top Row -->
-					<circle cx="285" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(12);" /><!--alert(this.cx.baseVal.value);"-->
+					<circle cx="285" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(12);" id="test" /><!--alert(this.cx.baseVal.value);"-->
 					<circle cx="388" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(11);" />
 					<circle cx="491" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(10);" />
 					<circle cx="649" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(9);" />
