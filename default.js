@@ -97,8 +97,10 @@ function drawBoard() {
  * Handles a human turn.
  * @param {Element} element - The pit or cache clicked by the user.
  */
-function humanTurn(element){
+function humanTurn(element) {
 	//this is called when a player clicks on a board square
+	if (typeof(element) != 'Element')
+		element = document.getElementById(element);
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
