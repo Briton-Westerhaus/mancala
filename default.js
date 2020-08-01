@@ -75,6 +75,7 @@ function initializeBoard() {
 	}
 	board[13] = new Array(34);//left cache
 	drawBoard();
+	placeStones(document.getElementById("test"));
 }
 
 /**
@@ -82,21 +83,24 @@ function initializeBoard() {
  * @param {Element} element 
  */
 function placeStones(element) {
+	const namespace = "http://www.w3.org/2000/svg";
 	const startX = element.cx.baseVal.value;
 	const startY = element.cy.baseVal.value;
 	const pit = board[12];
-	const numStones = pit.length;
+	const numStones = 1;//pit.length;
 	
 	let stones = [];
 	for (let i = 0; i < numStones; i++) {
-		let stone = document.createElement("image");
-		stone.href = pit[i] + "_stone.png";
-		stone.parentElement = document.getElementById("GameBoard");
+		let stone = document.createElementNS(namespace, "image");
+		stone.setAttributeNS(namespace, "href", pit[i] + "_stone.png");
+		stone.setAttributeNS(namespace, "height", 32);
+		stone.setAttributeNS(namespace, "width", 32);
 		stones.push(stone);
 	}
-	if (numStones >= 1) {
-		stones[0].x = startX;
-		stones[0].y = startY;
+	if (numStones == 1) {
+		stones[0].setAttributeNS(namespace, "x", startX);
+		stones[0].setAttributeNS(namespace, "y", startY);
+		document.getElementById("GameBoard").appendChild(stones[0]);
 	}
 }
 
