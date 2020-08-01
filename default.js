@@ -78,6 +78,24 @@ function initializeBoard() {
 }
 
 /**
+ * Places the stones clustered around the center of a pit.
+ * @param {Element} element 
+ */
+function placeStones(element) {
+	const startX = element.cx.baseVal.value;
+	const startY = element.cy.baseVal.value;
+	const numStones = board[element.id].length;
+	let stones = [];
+	for (let i = 0; i < numStones; i++) {
+		let stone = document.createElement("image");
+		stone.setAttribute("src", board[element.id][i] + "_stone.png");
+	}
+	if (numStones == 1) {
+		
+	}
+}
+
+/**
  * Places or removes stones from the board
  */
 function drawBoard() {
@@ -211,7 +229,7 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 
 /**
  * Gets the number of stones in a pit/cache given a board.
- * @param {Array.<String>} theBoard - An array denoting the color of stones in the pit or cache. 
+ * @param {Array.<String>} pit - An array denoting the color of stones in the pit or cache. 
  */
 function getNumStones(pit) {
 	return pit.findIndex(function(stone) { return !stone; });
