@@ -83,7 +83,6 @@ function initializeBoard() {
  * @param {Element} element 
  */
 function placeStones(element) {
-	const namespace = "http://www.w3.org/2000/svg";
 	const startX = element.cx.baseVal.value;
 	const startY = element.cy.baseVal.value;
 	const pit = board[12];
@@ -91,16 +90,16 @@ function placeStones(element) {
 	
 	let stones = [];
 	for (let i = 0; i < numStones; i++) {
-		let stone = document.createElementNS(namespace, "image");
-		stone.setAttributeNS(namespace, "href", pit[i] + "_stone.png");
-		stone.setAttributeNS(namespace, "height", 32);
-		stone.setAttributeNS(namespace, "width", 32);
+		let stone = document.createElementNS("http://www.w3.org/2000/svg", "image");
+		stone.setAttribute("href", pit[i] + "_stone.png");
+		stone.setAttribute("height", 32);
+		stone.setAttribute("width", 32);
 		stones.push(stone);
 	}
 	if (numStones == 1) {
-		stones[0].setAttributeNS(namespace, "x", startX);
-		stones[0].setAttributeNS(namespace, "y", startY);
-		document.getElementById("GameBoard").appendChild(stones[0]);
+		stones[0].setAttribute("x", startX - 16);
+		stones[0].setAttribute("y", startY - 16);
+		document.getElementById("GameBoard").append(stones[0]);
 	}
 }
 
