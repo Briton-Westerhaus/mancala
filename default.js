@@ -86,7 +86,10 @@ function placeStones(element) {
 	const startX = element.cx.baseVal.value;
 	const startY = element.cy.baseVal.value;
 	const pit = board[12];
-	const numStones = 1;//pit.length;
+	const numStones = getNumStones(pit);
+
+	if (numStones == 0)
+		return;
 	
 	let stones = [];
 	for (let i = 0; i < numStones; i++) {
@@ -96,10 +99,32 @@ function placeStones(element) {
 		stone.setAttribute("width", 32);
 		stones.push(stone);
 	}
-	if (numStones == 1) {
-		stones[0].setAttribute("x", startX - 16);
-		stones[0].setAttribute("y", startY - 16);
-		document.getElementById("GameBoard").append(stones[0]);
+	stones[0].setAttribute("x", startX - 16);
+	stones[0].setAttribute("y", startY - 16);
+	for (let i = 1; i < numStones; i++) {
+		let angle = Math.ceil(Math.random() * 360);
+		let sin = Math.sin(angle * Math.PI / 180);
+		let cos = Math.cos(angle * Math.PI / 180)
+		let distance = 32 - (32 / (i + 1));
+		let xDistance = Math.round(distance * cos);
+		let yDistance = Math.round(distance * sin);
+		stones[i].setAttribute("x", startX + xDistance);
+		stones[i].setAttribute("y", startY + yDistance);
+
+		distance = 32 - distance;
+		angle += 180;
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		xDistance = Math.round(distance * cos);
+		yDistance = Math.round(distance * sin);
+
+		for (let j = i - 1; j >= 0; j--) {
+			stones[j].setAttribute("x", stones[j].x.baseVal.value + xDistance);
+			stones[j].setAttribute("y", stones[j].y.baseVal.value + yDistance);
+		}
+	}
+	for (let i = 0; i < numStones; i++) {
+		document.getElementById("GameBoard").append(stones[i]);
 	}
 }
 
