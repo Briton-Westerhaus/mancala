@@ -108,8 +108,8 @@ function placeStones(element) {
 		let distance = 32 - (32 / (i + 1));
 		let xDistance = Math.round(distance * cos);
 		let yDistance = Math.round(distance * sin);
-		stones[i].setAttribute("x", startX + xDistance);
-		stones[i].setAttribute("y", startY + yDistance);
+		stones[i].setAttribute("x", startX - 16 + xDistance);
+		stones[i].setAttribute("y", startY - 16 + yDistance);
 
 		distance = 32 - distance;
 		angle += 180;
