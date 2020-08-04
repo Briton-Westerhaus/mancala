@@ -36,21 +36,21 @@
 				<div style="font-size: 0px; clear: both;">.</div>
 				<svg class="wholeboard" width="1055" height="326" id="GameBoard">
 					<!-- Top Row -->
-					<circle cx="285" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(12);" id="test" /><!--alert(this.cx.baseVal.value);"-->
-					<circle cx="388" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(11);" />
-					<circle cx="491" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(10);" />
-					<circle cx="649" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(9);" />
-					<circle cx="752" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(8);" />
-					<circle cx="855" cy="74" r="48" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(7);" />
+					<g onclick="humanTurn(this);" id="12"><circle cx="285" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="11"><circle cx="388" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="10"><circle cx="491" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="9"><circle cx="649" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="8"><circle cx="752" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="7"><circle cx="855" cy="74" r="48" fill="rgba(255, 255, 255, 0)" /></g>
 					<!-- Bottom Row -->
-					<circle cx="278" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(0);" />
-					<circle cx="383" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(1);" />
-					<circle cx="488" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(2);" />
-					<circle cx="650" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(3);" />
-					<circle cx="755" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(4);" />
-					<circle cx="859" cy="230" r="49" fill="rgba(255, 255, 255, 0)" onclick="humanTurn(5);" />
+					<g onclick="humanTurn(this);" id="0"><circle cx="278" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="1"><circle cx="383" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="2"><circle cx="488" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="3"><circle cx="650" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="4"><circle cx="755" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
+					<g onclick="humanTurn(this);" id="5"><circle cx="859" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
 				</svg>
-				<table class="wholeboard">
+				<!--<table class="wholeboard">
 					<tr>
 						<td class="select">
 							<table class="select">
@@ -520,7 +520,7 @@
 						</td>
 					</tr>
 				</table>
-			</div>
+			</div>-->
 			<!--end game board-->
 			<script type="text/javascript">initializeBoard();</script>
 			</div>

@@ -26,56 +26,33 @@ function initializeBoard() {
 	var temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").className = 'currentPlayer';
-	for (var i = 0; i < 6; i++) {
-		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
-			temp = Math.round(3 * Math.random());
-			switch (temp) {
-				case 0:
-					board[i][j] = "blue";
-					break;
-				case 1:
-					board[i][j] = "green";
-					break;
+	for (var i = 0; i < board.length; i++) {
+		board[i] = [];
+		if (i != 6 && i != 13) { // Don't initialize the two caches.
+			for (var j = 0; j < 3; j++) {
+				temp = Math.round(3 * Math.random());
+				switch (temp) {
+					case 0:
+						board[i].push("blue");
+						break;
+					case 1:
+						board[i].push("green");
+						break;
 
-				case 2:
-					board[i][j] = "red";
-					break;
-				case 3:
-					board[i][j] = "yellow";
-					break;
-				default:
-					break;
+					case 2:
+						board[i].push("red");
+						break;
+					case 3:
+						board[i].push("yellow");
+						break;
+					default:
+						break;
+				}
 			}
+			placeStones(document.getElementById(i));
 		}
 	}
-	board[6] = new Array(34);//right cache
-	for (var i = 7; i < 13; i++) {
-		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
-			temp = Math.round(3 * Math.random());
-			switch(temp){
-				case 0:
-					board[i][j] = "blue";
-					break;
-				case 1:
-					board[i][j] = "green";
-					break;
-
-				case 2:
-					board[i][j] = "red";
-					break;
-				case 3:
-					board[i][j] = "yellow";
-					break;
-				default:
-					break;
-			}
-		}
-	}
-	board[13] = new Array(34);//left cache
-	drawBoard();
-	placeStones(document.getElementById("test"));
+	//drawBoard();
 }
 
 /**
@@ -83,10 +60,10 @@ function initializeBoard() {
  * @param {Element} element 
  */
 function placeStones(element) {
-	const startX = element.cx.baseVal.value;
-	const startY = element.cy.baseVal.value;
-	const pit = board[12];
-	const numStones = getNumStones(pit);
+	const startX = element.childNodes[0].cx.baseVal.value;
+	const startY = element.childNodes[0].cy.baseVal.value;
+	const pit = board[element.id];
+	const numStones = pit.length;
 
 	if (numStones == 0)
 		return;
@@ -124,7 +101,7 @@ function placeStones(element) {
 		}
 	}
 	for (let i = 0; i < numStones; i++) {
-		document.getElementById("GameBoard").append(stones[i]);
+		element.append(stones[i]);
 	}
 }
 
@@ -150,8 +127,6 @@ function drawBoard() {
  */
 function humanTurn(element) {
 	//this is called when a player clicks on a board square
-	if (typeof(element) != 'Element')
-		element = document.getElementById(element);
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
