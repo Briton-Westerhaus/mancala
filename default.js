@@ -56,6 +56,17 @@ function initializeBoard() {
 }
 
 /**
+ * 
+ * @param {Element} startPit - The beginning pit where the stone is taken from
+ * @param {Element} endPit - The ending pit (or cache) where the stone is placed
+ */
+function moveStone(startPit, endPit) {
+	let stone = startPit.childNodes[startPit.childNodes.length - 1];
+	let boardStone = board[startPit].pop();
+	startPit.removeChild(stone);
+}
+
+/**
  * Places the stones clustered around the center of a pit.
  * @param {Element} element 
  */
@@ -240,7 +251,8 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
  * @param {Array.<String>} pit - An array denoting the color of stones in the pit or cache. 
  */
 function getNumStones(pit) {
-	return pit.findIndex(function(stone) { return !stone; });
+	return pit.length; // This might be totally unneccessary. 
+	// return pit.findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -414,11 +426,8 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
  */
 async function animateMove(element) {
 	// Move stones to temporary array.
-	var toMove = new Array(15);
-	for (let i = 0; i < 15; i++) {
-		toMove[i] = board[element.id][i];
-		board[element.id][i] = "";
-	}
+	let toMove = board[element.id];
+	board[element.id] = [];
 
 	var spot = element.id;
 	let emptyIndex;
@@ -429,8 +438,8 @@ async function animateMove(element) {
 			spot = 0;
 		
 		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
-		board[spot][emptyIndex] = toMove[j];
-		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
+		board[spot].push(toMove.pop());
+		element.childNodes[j + 1].style.transform = getTransform(element.id, spot, j, emptyIndex);
 
 		await new Promise(r => setTimeout(r, 400));
 		playAudio(emptyIndex);
