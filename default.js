@@ -60,9 +60,36 @@ function initializeBoard() {
  * @param {Element} startPit - The beginning pit where the stone is taken from
  * @param {Element} endPit - The ending pit (or cache) where the stone is placed
  */
-function moveStone(startPit, endPit) {
+async function moveStone(startPit, endPit) {
 	let stone = startPit.childNodes[startPit.childNodes.length - 1];
 	let boardStone = board[startPit].pop();
+	let xOffset = 0, yOffset = 0;
+
+	/* Copied from placeStones(). Most of this will be done here, but slightly differently. 
+	let angle = Math.ceil(Math.random() * 360);
+	let sin = Math.sin(angle * Math.PI / 180);
+	let cos = Math.cos(angle * Math.PI / 180)
+	let distance = 32 - (32 / (i + 1));
+	let xDistance = Math.round(distance * cos);
+	let yDistance = Math.round(distance * sin);
+	stones[i].setAttribute("x", startX - 16 + xDistance);
+	stones[i].setAttribute("y", startY - 16 + yDistance);
+
+	distance = 32 - distance;
+	angle += 180;
+	sin = Math.sin(angle * Math.PI / 180);
+	cos = Math.cos(angle * Math.PI / 180)
+	xDistance = Math.round(distance * cos);
+	yDistance = Math.round(distance * sin);
+
+	for (let j = i - 1; j >= 0; j--) {
+		stones[j].setAttribute("x", stones[j].x.baseVal.value + xDistance);
+		stones[j].setAttribute("y", stones[j].y.baseVal.value + yDistance);
+	}
+	*/
+
+	stone.style.transform =  "translate(" + xOffset + "px, " + yOffset + "px)";
+	
 	startPit.removeChild(stone);
 }
 
