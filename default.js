@@ -65,15 +65,16 @@ async function moveStone(startPit, endPit) {
 	let boardStone = board[startPit].pop();
 	let xOffset = 0, yOffset = 0;
 
-	/* Copied from placeStones(). Most of this will be done here, but slightly differently. 
+	// Copied from placeStones(). Most of this will be done here, but slightly differently. 
 	let angle = Math.ceil(Math.random() * 360);
 	let sin = Math.sin(angle * Math.PI / 180);
 	let cos = Math.cos(angle * Math.PI / 180)
 	let distance = 32 - (32 / (i + 1));
 	let xDistance = Math.round(distance * cos);
 	let yDistance = Math.round(distance * sin);
-	stones[i].setAttribute("x", startX - 16 + xDistance);
-	stones[i].setAttribute("y", startY - 16 + yDistance);
+	let transform = "translate(" + xOffset + "px, " + yOffset + "px)";
+	//stones[i].setAttribute("x", startX - 16 + xDistance);
+	//stones[i].setAttribute("y", startY - 16 + yDistance);
 
 	distance = 32 - distance;
 	angle += 180;
