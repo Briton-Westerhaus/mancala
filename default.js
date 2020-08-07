@@ -62,19 +62,26 @@ function initializeBoard() {
  */
 async function moveStone(startPit, endPit) {
 	let stone = startPit.childNodes[startPit.childNodes.length - 1];
-	let boardStone = board[startPit].pop();
+	let boardStone = board[startPit.id].pop();
 	let xOffset = 0, yOffset = 0;
 
 	// Copied from placeStones(). Most of this will be done here, but slightly differently. 
 	let angle = Math.ceil(Math.random() * 360);
 	let sin = Math.sin(angle * Math.PI / 180);
 	let cos = Math.cos(angle * Math.PI / 180)
-	let distance = 32 - (32 / (i + 1));
+	let distance = 32 - (32 / (endPit.childNodes.length));
 	let xDistance = Math.round(distance * cos);
 	let yDistance = Math.round(distance * sin);
-	let transform = "translate(" + xOffset + "px, " + yOffset + "px)";
+	let startX = startPit.childNodes[0].cx.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
+	let startY = startPit.childNodes[0].cy.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+
+	let transform = "translate(" + (endPit.childNodes[0].cx.baseVal.value + xDistance) - startX + "px, " + (endPit.childNodes[0].cy.baseVal.value + xDistance) - startY + "px)";
+
 	//stones[i].setAttribute("x", startX - 16 + xDistance);
 	//stones[i].setAttribute("y", startY - 16 + yDistance);
+
+	stone.style.transform =  transform;
+	await new Promise(r => setTimeout(r, 400)); 
 
 	distance = 32 - distance;
 	angle += 180;
@@ -83,13 +90,10 @@ async function moveStone(startPit, endPit) {
 	xDistance = Math.round(distance * cos);
 	yDistance = Math.round(distance * sin);
 
-	for (let j = i - 1; j >= 0; j--) {
-		stones[j].setAttribute("x", stones[j].x.baseVal.value + xDistance);
-		stones[j].setAttribute("y", stones[j].y.baseVal.value + yDistance);
+	for (let i = 1; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + xDistance);
+		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + yDistance);
 	}
-	*/
-
-	stone.style.transform =  "translate(" + xOffset + "px, " + yOffset + "px)";
 	
 	startPit.removeChild(stone);
 }
@@ -182,7 +186,7 @@ async function computerTurn() {
 	var empty;
 	user = !user;
 	while (user) {
-		drawBoard();
+		//drawBoard();
 		maxMoveVal = -37;
 		moveVal = -37;
 		for (var i = 7; i < 13; i++) {
@@ -208,7 +212,7 @@ async function computerTurn() {
 				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
 		}
-		drawBoard();
+		//drawBoard();
 	}
 	switchUser();
 }
@@ -454,20 +458,20 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
  */
 async function animateMove(element) {
 	// Move stones to temporary array.
-	let toMove = board[element.id];
-	board[element.id] = [];
+	//let toMove = board[element.id];
+	//board[element.id] = [];
 
 	var spot = element.id;
 	let emptyIndex;
 
-	for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+	for (; board[element.id].length > 0;) {
 		spot++;
 		if (spot > 13)
 			spot = 0;
-		
+		await moveStone(element, document.getElementById(spot));
 		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
-		board[spot].push(toMove.pop());
-		element.childNodes[j + 1].style.transform = getTransform(element.id, spot, j, emptyIndex);
+		board[spot].push(board[element.id].pop());
+		//element.childNodes[j + 1].style.transform = getTransform(element.id, spot, j, emptyIndex);
 
 		await new Promise(r => setTimeout(r, 400));
 		playAudio(emptyIndex);
@@ -477,7 +481,7 @@ async function animateMove(element) {
 	if (spot == 6 && user || spot == 13 && !user)
 		switchUser();
 
-	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	/*if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		for (var i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
 			board[12 - spot][i] = "";
@@ -516,7 +520,7 @@ async function animateMove(element) {
 					i = board[13].length;
 			}
 		}
-	}
+	}*/
 }
 
 /**
@@ -528,7 +532,7 @@ async function moveStones(element) {
 	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
 		await animateMove(element);
 		switchUser();
-		drawBoard();
+		//drawBoard();
 	} else {
 		return false;
 	}
@@ -581,7 +585,7 @@ async function moveStones(element) {
 		
 		// Perform computer move.
 		if (players == 1 && !user) {
-			drawBoard();
+			//drawBoard();
 			await computerTurn();
 
 			// Calculate scores
