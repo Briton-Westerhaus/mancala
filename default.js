@@ -62,7 +62,7 @@ function initializeBoard() {
  */
 async function moveStone(startPit, endPit) {
 	let stone = startPit.childNodes[startPit.childNodes.length - 1];
-	let boardStone = board[startPit.id].pop();
+	//let boardStone = board[startPit.id].pop();
 	let xOffset = 0, yOffset = 0;
 
 	// Copied from placeStones(). Most of this will be done here, but slightly differently. 
@@ -473,7 +473,7 @@ async function animateMove(element) {
 		board[spot].push(board[element.id].pop());
 		//element.childNodes[j + 1].style.transform = getTransform(element.id, spot, j, emptyIndex);
 
-		await new Promise(r => setTimeout(r, 400));
+		//await new Promise(r => setTimeout(r, 400));
 		playAudio(emptyIndex);
 	}
 
