@@ -96,6 +96,9 @@ async function moveStone(startPit, endPit) {
 	}
 	
 	startPit.removeChild(stone);
+	stone.x = (endPit.childNodes[0].cx.baseVal.value + xDistance);
+	stone.y = (endPit.childNodes[0].cy.baseVal.value + xDistance);
+	endPit.append(stone);
 }
 
 /**
