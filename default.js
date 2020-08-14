@@ -65,6 +65,18 @@ async function moveStone(startPit, endPit) {
 	//let boardStone = board[startPit.id].pop();
 	let xOffset = 0, yOffset = 0;
 
+	let endXProp = '';
+	let endYProp = '';
+
+	if (endPit.id != 6 && endPit.id != 13) { // pits
+		endXProp = 'c';
+		endYProp = 'c';
+	}
+
+	endXProp += 'x';
+	endYProp += 'y';
+
+
 	// Copied from placeStones(). Most of this will be done here, but slightly differently. 
 	let angle = Math.ceil(Math.random() * 360);
 	let sin = Math.sin(angle * Math.PI / 180);
@@ -75,7 +87,7 @@ async function moveStone(startPit, endPit) {
 	let startX = startPit.childNodes[0].cx.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
 	let startY = startPit.childNodes[0].cy.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
 
-	let transform = "translate(" + (endPit.childNodes[0].cx.baseVal.value + xDistance) - startX + "px, " + (endPit.childNodes[0].cy.baseVal.value + xDistance) - startY + "px)";
+	let transform = "translate(" + (endPit.childNodes[0][endXProp].baseVal.value + xDistance) - startX + "px, " + (endPit.childNodes[0][endYProp].baseVal.value + xDistance) - startY + "px)";
 
 	//stones[i].setAttribute("x", startX - 16 + xDistance);
 	//stones[i].setAttribute("y", startY - 16 + yDistance);
@@ -96,8 +108,8 @@ async function moveStone(startPit, endPit) {
 	}
 	
 	startPit.removeChild(stone);
-	stone.x = (endPit.childNodes[0].cx.baseVal.value + xDistance);
-	stone.y = (endPit.childNodes[0].cy.baseVal.value + xDistance);
+	stone.setAttribute("x", endPit.childNodes[0][endXProp].baseVal.value + xDistance);
+	stone.setAttribute("y", endPit.childNodes[0][endYProp].baseVal.value + yDistance);
 	endPit.append(stone);
 }
 
