@@ -71,6 +71,9 @@ async function moveStone(startPit, endPit) {
 	if (endPit.id != 6 && endPit.id != 13) { // pits
 		endXProp = 'c';
 		endYProp = 'c';
+	} else { //caches
+		xOffset += endPit.childNodes[0].width.baseVal.value / 2;
+		yOffset += endPit.childNodes[0].height.baseVal.value / 2;
 	}
 
 	endXProp += 'x';
@@ -82,15 +85,12 @@ async function moveStone(startPit, endPit) {
 	let sin = Math.sin(angle * Math.PI / 180);
 	let cos = Math.cos(angle * Math.PI / 180)
 	let distance = 32 - (32 / (endPit.childNodes.length));
-	let xDistance = Math.round(distance * cos);
-	let yDistance = Math.round(distance * sin);
+	let xDistance = Math.round(distance * cos) + xOffset;
+	let yDistance = Math.round(distance * sin) + yOffset;
 	let startX = startPit.childNodes[0].cx.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
 	let startY = startPit.childNodes[0].cy.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
 
 	let transform = "translate(" + (endPit.childNodes[0][endXProp].baseVal.value + xDistance) - startX + "px, " + (endPit.childNodes[0][endYProp].baseVal.value + xDistance) - startY + "px)";
-
-	//stones[i].setAttribute("x", startX - 16 + xDistance);
-	//stones[i].setAttribute("y", startY - 16 + yDistance);
 
 	stone.style.transform =  transform;
 	await new Promise(r => setTimeout(r, 400)); 
@@ -99,12 +99,12 @@ async function moveStone(startPit, endPit) {
 	angle += 180;
 	sin = Math.sin(angle * Math.PI / 180);
 	cos = Math.cos(angle * Math.PI / 180)
-	xDistance = Math.round(distance * cos);
-	yDistance = Math.round(distance * sin);
+	let newXDistance = Math.round(distance * cos);
+	let newYDistance = Math.round(distance * sin);
 
 	for (let i = 1; i < endPit.childNodes.length; i++) {
-		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + xDistance);
-		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + yDistance);
+		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
+		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
 	}
 	
 	startPit.removeChild(stone);
