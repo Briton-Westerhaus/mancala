@@ -99,8 +99,18 @@ async function moveStone(startPit, endPit) {
 	cos = Math.cos(angle * Math.PI / 180)
 	let newXDistance = Math.round(distance * cos);
 	let newYDistance = Math.round(distance * sin);
+	transform = "translate(" + newXDistance.toString() + "px, " + newYDistance.toString() + "px)";
 
 	for (let i = 1; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].style.transform = transform;
+		endPit.childNodes[i].style.transition = "transform .1s ease";
+	}
+
+	await new Promise(r => setTimeout(r, 200)); 
+
+	for (let i = 1; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].style.transition = "transform .0s ease";
+		endPit.childNodes[i].style.transform = "translate(0px, 0px)";
 		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
 		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
 	}
@@ -110,6 +120,12 @@ async function moveStone(startPit, endPit) {
 	stone.setAttribute("y", endPit.childNodes[0][endYProp].baseVal.value - 16 + yDistance);
 	stone.style.transform = "translate(0px, 0px)";
 	endPit.append(stone);
+
+	await new Promise(r => setTimeout(r, 300)); 
+
+	for (let i = 1; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].style.transition = "transform .3s ease";
+	}
 }
 
 /**
