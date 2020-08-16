@@ -88,7 +88,7 @@ async function moveStone(startPit, endPit) {
 	let startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
 	let startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
 
-	let transform = "translate(" + ((endPit.childNodes[0][endXProp].baseVal.value + xDistance).toString() - startX - 16) + "px, " + ((endPit.childNodes[0][endYProp].baseVal.value + xDistance) - startY - 16).toString() + "px)";
+	let transform = "translate(" + ((endPit.childNodes[0][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[0][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
 
 	stone.style.transform =  transform;
 	await new Promise(r => setTimeout(r, 400)); 
