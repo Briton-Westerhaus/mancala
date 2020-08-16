@@ -79,18 +79,16 @@ async function moveStone(startPit, endPit) {
 	endXProp += 'x';
 	endYProp += 'y';
 
-
-	// Copied from placeStones(). Most of this will be done here, but slightly differently. 
 	let angle = Math.ceil(Math.random() * 360);
 	let sin = Math.sin(angle * Math.PI / 180);
 	let cos = Math.cos(angle * Math.PI / 180)
 	let distance = 32 - (32 / (endPit.childNodes.length));
 	let xDistance = Math.round(distance * cos) + xOffset;
 	let yDistance = Math.round(distance * sin) + yOffset;
-	let startX = startPit.childNodes[0].cx.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
-	let startY = startPit.childNodes[0].cy.baseVal.value + startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+	let startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
+	let startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
 
-	let transform = "translate(" + (endPit.childNodes[0][endXProp].baseVal.value + xDistance) - startX + "px, " + (endPit.childNodes[0][endYProp].baseVal.value + xDistance) - startY + "px)";
+	let transform = "translate(" + ((endPit.childNodes[0][endXProp].baseVal.value + xDistance).toString() - startX - 16) + "px, " + ((endPit.childNodes[0][endYProp].baseVal.value + xDistance) - startY - 16).toString() + "px)";
 
 	stone.style.transform =  transform;
 	await new Promise(r => setTimeout(r, 400)); 
@@ -108,8 +106,9 @@ async function moveStone(startPit, endPit) {
 	}
 	
 	startPit.removeChild(stone);
-	stone.setAttribute("x", endPit.childNodes[0][endXProp].baseVal.value + xDistance);
-	stone.setAttribute("y", endPit.childNodes[0][endYProp].baseVal.value + yDistance);
+	stone.setAttribute("x", endPit.childNodes[0][endXProp].baseVal.value - 16 + xDistance);
+	stone.setAttribute("y", endPit.childNodes[0][endYProp].baseVal.value - 16 + yDistance);
+	stone.style.transform = "translate(0px, 0px)";
 	endPit.append(stone);
 }
 

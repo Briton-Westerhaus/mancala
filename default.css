@@ -105,6 +105,10 @@ td {
 	/*transform: translate(61px, 0px);*/
 }
 
+svg image{
+	transition: transform .3s ease;
+}
+
 .leftcolumn {
 	vertical-align: center;
 	position: relative;
