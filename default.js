@@ -113,6 +113,11 @@ async function moveStone(startPit, endPit) {
 		endPit.childNodes[i].style.transform = "translate(0px, 0px)";
 		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
 		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
+		new Promise(r => {
+			setTimeout(r, 300);
+		}).then(() => {
+			endPit.childNodes[i].style.transition = "transform .3s ease";
+		}); 
 	}
 	
 	startPit.removeChild(stone);
@@ -120,12 +125,6 @@ async function moveStone(startPit, endPit) {
 	stone.setAttribute("y", endPit.childNodes[0][endYProp].baseVal.value - 16 + yDistance);
 	stone.style.transform = "translate(0px, 0px)";
 	endPit.append(stone);
-
-	await new Promise(r => setTimeout(r, 300)); 
-
-	for (let i = 1; i < endPit.childNodes.length; i++) {
-		endPit.childNodes[i].style.transition = "transform .3s ease";
-	}
 }
 
 /**
