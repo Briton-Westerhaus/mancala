@@ -500,9 +500,7 @@ async function animateMove(element) {
 		await moveStone(element, document.getElementById(spot));
 		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
 		board[spot].push(board[element.id].pop());
-		//element.childNodes[j + 1].style.transform = getTransform(element.id, spot, j, emptyIndex);
 
-		//await new Promise(r => setTimeout(r, 400));
 		playAudio(emptyIndex);
 	}
 
