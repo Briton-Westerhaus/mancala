@@ -508,46 +508,42 @@ async function animateMove(element) {
 	if (spot == 6 && user || spot == 13 && !user)
 		switchUser();
 
-	/*if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		for (var i = 0; i < 15; i++) {
-			toMove[i] = board[12 - spot][i];
-			board[12 - spot][i] = "";
-		}
-		var j = 0;
-		for (let i = 0; i < board[6].length; i++) {
-			if (board[6][i] == "" || board[6][i] == null) {
-				if (board[spot][0] != null && board[spot][0] != "") {
-					board[6][i] = board[spot][0];
-					board[spot][0] = "";
-					i++;
-				}
-				board[6][i] = toMove[j];
-				j++;
-				if(toMove[j] == null || toMove[j] == "")
-					i = board[6].length;
-			}
+	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+		// TODO: Make it so these happen all at once. 
+		await moveStone(document.getElementById(spot), document.getElementById(6));
+		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
+		board[6].push(board[spot].pop());
+		
+		playAudio(emptyIndex);
+
+		while (board[12 - spot].length > 0) {
+			await moveStone(document.getElementById(12 - spot), document.getElementById(6));
+			emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
+			board[6].push(board[12 - spot].pop());
+
+			playAudio(emptyIndex);
 		}
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
+		// TODO: Make it so these happen all at once. 
+		await moveStone(document.getElementById(spot), document.getElementById(13));
+		emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
+		board[13].push(board[spot].pop());
+		
+		playAudio(emptyIndex);
+
+		while (board[12 - spot].length > 0) {
+			await moveStone(document.getElementById(12 - spot), document.getElementById(13));
+			emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
+			board[13].push(board[12 - spot].pop());
+
+			playAudio(emptyIndex);
+		}
 		for (let i = 0; i < 15; i++) {
 			toMove[i] = board[12 - spot][i];
 			board[12 - spot][i] = "";
 		}
-		var j = 0;
-		for (let i = 0; i < board[13].length; i++) {
-			if (board[13][i] == "" || board[13][i] == null) {
-				if (board[spot][0] != null && board[spot][0] != "") {
-					board[13][i] = board[spot][0];
-					board[spot][0] = "";
-					i++;
-				}
-				board[13][i] = toMove[j];
-				j++;
-				if (toMove[j] == null || toMove[j] == "")
-					i = board[13].length;
-			}
-		}
-	}*/
+	}
 }
 
 /**
