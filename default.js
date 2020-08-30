@@ -686,8 +686,10 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			emptyIndex = getNumStones(thisBoard[moveSquare]);
 			thisBoard[moveSquare][emptyIndex] = toMove[j];
 			if (realUser) {
-				document.getElementById(initialMoveSquare + "." + j).style.transform = getTransform(initialMoveSquare, moveSquare, j, emptyIndex);
-				await new Promise(r => setTimeout(r, 400));
+				await moveStone(document.getElementById(initialMoveSquare), document.getElementById(moveSquare));
+				emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
+				board[moveSquare].push(board[initialMoveSquare].pop());
+		
 				playAudio(emptyIndex);
 			}
 		}
