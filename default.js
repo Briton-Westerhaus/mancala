@@ -125,6 +125,8 @@ async function moveStone(startPit, endPit) {
 	stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistance);
 	stone.style.transform = "translate(0px, 0px)";
 	endPit.append(stone);
+
+	endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
 }
 
 /**
