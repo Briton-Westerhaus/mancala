@@ -541,10 +541,6 @@ async function animateMove(element) {
 
 			playAudio(emptyIndex);
 		}
-		for (let i = 0; i < 15; i++) {
-			toMove[i] = board[12 - spot][i];
-			board[12 - spot][i] = "";
-		}
 	}
 }
 
@@ -704,7 +700,21 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			
+			// TODO: Make it so these happen all at once. 
+			await moveStone(document.getElementById(moveSquare), document.getElementById(13));
+			emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
+			board[13].push(board[moveSquare].pop());
+
+			playAudio(emptyIndex);
+
+			while (board[12 - moveSquare].length > 0) {
+				await moveStone(document.getElementById(12 - moveSquare), document.getElementById(13));
+				emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
+				board[13].push(board[12 - moveSquare].pop());
+
+				playAudio(emptyIndex);
+			}
+			/*
 			let emptyIndex;
 
 			// Move stones to temporary array. 
@@ -722,7 +732,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			// Do the actual moving.
 			for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
 				thisBoard[13][emptyIndex] = toMove[i];
-			}
+			}*/
 		}
 		return;
 	}
