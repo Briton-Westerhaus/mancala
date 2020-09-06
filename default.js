@@ -126,6 +126,7 @@ async function moveStone(startPit, endPit) {
 	stone.style.transform = "translate(0px, 0px)";
 	endPit.append(stone);
 
+	startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
 	endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
 }
 
