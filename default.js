@@ -667,12 +667,8 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	const initialMoveSquare = moveSquare;
 	
 	// Move stones to temporary array.
-	var toMove = new Array(15);
-
-	for (let i = 0; i < 15; i++) {
-		toMove[i] = thisBoard[moveSquare][i];
-		thisBoard[moveSquare][i] = "";
-	}
+	let toMove = thisBoard[moveSquare];
+	thisBoard[moveSquare] = [];
 	
 	if ((user && realUser) || (!realUser && tempUser)) {
 		// Move the stones.
@@ -748,25 +744,17 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 
 	// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 	if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-
-		let emptyIndex;
 		
-		// Move stones to temporary array. 
-		for(let i = 0; i < 15; i++) {
-			toMove[i] = thisBoard[6 + moveSquare][i];
-			thisBoard[6 + moveSquare][i] = "";
-		}
-
-		emptyIndex = getNumStones(thisBoard[6]);
+		// Move stones to temporary array.
+		toMove = thisBoard[6 + moveSquare];
+		thisBoard[6 + moveSquare] = [];
 			
 		// Move the last moved stone to the cache.
-		thisBoard[6][emptyIndex] = thisBoard[moveSquare][0];
-		thisBoard[moveSquare][0] = "";
-		emptyIndex++;
+		thisBoard[6].push(thisBoard[moveSquare].pop());
 
 		// Do the actual moving.
-		for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
-			thisBoard[6][emptyIndex] = toMove[i];
+		while (toMove.length > 0) {
+			thisBoard[6].push(toMove.pop());
 		}
 	}
 }
