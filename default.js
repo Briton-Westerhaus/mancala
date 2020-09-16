@@ -673,13 +673,13 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	if ((user && realUser) || (!realUser && tempUser)) {
 		// Move the stones.
 		let emptyIndex;
-		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+		while (toMove.length > 0) {
 			moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
 			
-			emptyIndex = getNumStones(thisBoard[moveSquare]);
-			thisBoard[moveSquare][emptyIndex] = toMove[j];
+			thisBoard[moveSquare].push(toMove.pop());
+
 			if (realUser) {
 				await moveStone(document.getElementById(initialMoveSquare), document.getElementById(moveSquare));
 				emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
@@ -726,13 +726,11 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		return;
 	}
 	// This is when we're simulating a player turn during recursion. 
-	let emptyIndex;
-	for(j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+	while (toMove.length > 0) {
 		moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
-		thisBoard[moveSquare][emptyIndex] = toMove[j];
+		thisBoard[moveSquare].push(toMove.pop());
 	}
 	// The final stone ends in the cache, so the player gets another turn. 
 	if (moveSquare == 6) {
