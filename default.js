@@ -678,15 +678,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			if(moveSquare > 13)
 				moveSquare = 0;
 			
-			thisBoard[moveSquare].push(toMove.pop());
-
+			emptyIndex = getNumStones(thisBoard[moveSquare]); // The number of stones also indicates the first empty slot.
 			if (realUser) {
 				await moveStone(document.getElementById(initialMoveSquare), document.getElementById(moveSquare));
-				emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
-				board[moveSquare].push(board[initialMoveSquare].pop());
-		
 				playAudio(emptyIndex);
 			}
+			thisBoard[moveSquare].push(toMove.pop());
 		}
 		// Computer ended in their cache. They have another turn. 
 		if (moveSquare == 13) {
@@ -698,29 +695,20 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
 			// TODO: Make it so these happen all at once. 
+			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
 			if (realUser) {
 				await moveStone(document.getElementById(moveSquare), document.getElementById(13));
-				emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
-				board[13].push(board[moveSquare].pop());
-
 				playAudio(emptyIndex);
-
-				while (board[12 - moveSquare].length > 0) {
-					await moveStone(document.getElementById(12 - moveSquare), document.getElementById(13));
-					emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
-					board[13].push(board[12 - moveSquare].pop());
-
-					playAudio(emptyIndex);
-				}
 			}
-			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
-			thisBoard[13].push(board[moveSquare].pop());
+			thisBoard[13].push(thisBoard[moveSquare].pop());
 
 			while (thisBoard[12 - moveSquare].length > 0) {
 				emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
+				if (realUser) {
+					await moveStone(document.getElementById(12 - moveSquare), document.getElementById(13));
+					playAudio(emptyIndex);
+				}
 				thisBoard[13].push(thisBoard[12 - moveSquare].pop());
-
-				playAudio(emptyIndex);
 			}
 		}
 		return;
