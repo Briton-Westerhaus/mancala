@@ -131,6 +131,93 @@ async function moveStone(startPit, endPit) {
 }
 
 /**
+ * Moves all the stones from one pit to another.
+ * @param {Element} startPit - The pit where the stones move from.
+ * @param {Element} endPit - The pit where the stones move to.
+ */
+async function moveStones(startPit, endPit) {
+	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance;
+	while (board[startPit.id].length > 0) {
+		// Starting moving stones
+		stone = startPit.childNodes[startPit.childNodes.length - 1];
+		xOffset = 0;
+		yOffset = 0;
+
+
+		endXProp = '';
+		endYProp = '';
+
+		if (endPit.id != 6 && endPit.id != 13) { // pits
+			endXProp = 'c';
+			endYProp = 'c';
+		} else { //caches
+			xOffset += endPit.childNodes[1].width.baseVal.value / 2;
+			yOffset += endPit.childNodes[1].height.baseVal.value / 2;
+		}
+
+		endXProp += 'x';
+		endYProp += 'y';
+
+		angle = Math.ceil(Math.random() * 360);
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		distance = 32 - (32 / (endPit.childNodes.length - 1));
+		xDistance = Math.round(distance * cos) + xOffset;
+		yDistance = Math.round(distance * sin) + yOffset;
+		startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
+		startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+
+		transform = "translate(" + ((endPit.childNodes[1][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[1][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
+
+		stone.style.transform =  transform;
+		//await new Promise(r => setTimeout(r, 400)); 
+
+		distance = 32 - distance;
+		angle += 180;
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		newXDistance = Math.round(distance * cos);
+		newYDistance = Math.round(distance * sin);
+		transform = "translate(" + newXDistance.toString() + "px, " + newYDistance.toString() + "px)";
+
+		for (let i = 2; i < endPit.childNodes.length; i++) {
+			endPit.childNodes[i].style.transform = transform;
+			endPit.childNodes[i].style.transition = "transform .1s ease";
+		}
+
+		//await new Promise(r => setTimeout(r, 200)); 
+
+		for (let i = 2; i < endPit.childNodes.length; i++) {
+			endPit.childNodes[i].style.transition = "transform .0s ease";
+			endPit.childNodes[i].style.transform = "translate(0px, 0px)";
+			endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
+			endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
+			new Promise(r => {
+				setTimeout(r, 300);
+			}).then(() => {
+				endPit.childNodes[i].style.transition = "transform .3s ease";
+			}); 
+		}
+		
+		startPit.removeChild(stone);
+		stone.setAttribute("x", endPit.childNodes[1][endXProp].baseVal.value - 16 + xDistance);
+		stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistance);
+		stone.style.transform = "translate(0px, 0px)";
+		endPit.append(stone);
+
+		startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
+		endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
+
+		board[endPit.id].push(board[startPit.id].pop());
+		// End moving stones
+	}
+	await new Promise(r => setTimeout(r, 400)); 
+
+	emptyIndex = getNumStones(board[endPit.id]); // The number of stones also indicates the first empty slot.
+	playAudio(emptyIndex);
+}
+
+/**
  * Places the stones clustered around the center of a pit.
  * @param {Element} element 
  */
@@ -200,12 +287,115 @@ function drawBoard() {
  * Handles a human turn.
  * @param {Element} element - The pit or cache clicked by the user.
  */
-function humanTurn(element) {
+async function humanTurn(element) {
 	//this is called when a player clicks on a board square
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
-	moveStones(element);
+
+	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
+		await animateMove(element);
+		switchUser();
+		//drawBoard();
+	} else {
+		return false;
+	}
+	// Recalculate scores
+	scores[0] = 0;
+	scores[1] = 0;
+
+	for (let i = 0; i < 34; i++) {
+		if(board[6][i] != null && board[6][i] != "")
+			scores[0]++;
+	}
+
+	for (let i = 0; i < 34; i++) {
+		if(board[13][i] != null && board[13][i] != "")
+			scores[1]++;
+	}
+
+	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
+	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+	// Check for the end of the game.
+	if (scores[0] + scores[1] == 36) {
+		var newOne;
+		if (scores[0] > scores[1])
+			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+		if (scores[0] < scores[1])
+			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
+		if (scores[0] == scores[1])
+			newOne = confirm("The game is a tie!\n  Would you like a new game?");
+		if (newOne)
+			window.location.reload();
+	} else {
+		// Check whether the turn advances or if the opposite player has no legal moves.
+		var empty;
+		if (user) {
+			empty = isEmpty(board, user);
+			if (empty) {
+				switchUser();
+				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
+			}
+		}
+
+		if (!user) {
+			empty = isEmpty(board, user);
+			if (empty) {
+				switchUser();
+				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+			}
+		}
+		
+		// Perform computer move.
+		if (players == 1 && !user) {
+			//drawBoard();
+			await computerTurn();
+
+			// Calculate scores
+			scores[0] = 0;
+			scores[1] = 0;
+			for (let i = 0; i < 34; i++) {
+				if(board[6][i] != null && board[6][i] != "")
+					scores[0]++;
+			}
+			for (let i = 0; i < 34; i++) {
+				if(board[13][i] != null && board[13][i] != "")
+					scores[1]++;
+			}
+			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
+			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+			// Check for the end of the game.
+			if (scores[0] + scores[1] == 36) {
+				var newOne;
+				if(scores[0] > scores[1])
+					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+				if(scores[0] < scores[1])
+					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
+				if(scores[0] == scores[1])
+					newOne = confirm("The game is a tie!\n  Would you like a new game?");
+				if(newOne)
+					window.location.reload();
+			} else {
+				// Check whether the turn advances or if the opposite player has no legal moves.
+				if (user) {
+					empty = isEmpty(board, user);
+					if(empty){
+						switchUser();
+						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
+					}
+				}
+				if (!user) {
+					empty = isEmpty(board, user);
+					if (empty) {
+						switchUser();
+						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+					}
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -519,13 +709,15 @@ async function animateMove(element) {
 		
 		playAudio(emptyIndex);
 
-		while (board[12 - spot].length > 0) {
+		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
+
+		/*while (board[12 - spot].length > 0) {
 			await moveStone(document.getElementById(12 - spot), document.getElementById(6));
 			emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
 			board[6].push(board[12 - spot].pop());
 
 			playAudio(emptyIndex);
-		}
+		}*/
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		// TODO: Make it so these happen all at once. 
@@ -541,117 +733,6 @@ async function animateMove(element) {
 			board[13].push(board[12 - spot].pop());
 
 			playAudio(emptyIndex);
-		}
-	}
-}
-
-/**
- * Handles a move and calculates the end of a game. 
- * @param {Element} element - The pit of the move.
- */
-async function moveStones(element) {
-	
-	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
-		await animateMove(element);
-		switchUser();
-		//drawBoard();
-	} else {
-		return false;
-	}
-	// Recalculate scores
-	scores[0] = 0;
-	scores[1] = 0;
-
-	for (let i = 0; i < 34; i++) {
-		if(board[6][i] != null && board[6][i] != "")
-			scores[0]++;
-	}
-
-	for (let i = 0; i < 34; i++) {
-		if(board[13][i] != null && board[13][i] != "")
-			scores[1]++;
-	}
-
-	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
-	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
-
-	// Check for the end of the game.
-	if (scores[0] + scores[1] == 36) {
-		var newOne;
-		if (scores[0] > scores[1])
-			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
-		if (scores[0] < scores[1])
-			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
-		if (scores[0] == scores[1])
-			newOne = confirm("The game is a tie!\n  Would you like a new game?");
-		if (newOne)
-			window.location.reload();
-	} else {
-		// Check whether the turn advances or if the opposite player has no legal moves.
-		var empty;
-		if (user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
-			}
-		}
-
-		if (!user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
-			}
-		}
-		
-		// Perform computer move.
-		if (players == 1 && !user) {
-			//drawBoard();
-			await computerTurn();
-
-			// Calculate scores
-			scores[0] = 0;
-			scores[1] = 0;
-			for (let i = 0; i < 34; i++) {
-				if(board[6][i] != null && board[6][i] != "")
-					scores[0]++;
-			}
-			for (let i = 0; i < 34; i++) {
-				if(board[13][i] != null && board[13][i] != "")
-					scores[1]++;
-			}
-			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
-			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
-
-			// Check for the end of the game.
-			if (scores[0] + scores[1] == 36) {
-				var newOne;
-				if(scores[0] > scores[1])
-					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
-				if(scores[0] < scores[1])
-					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
-				if(scores[0] == scores[1])
-					newOne = confirm("The game is a tie!\n  Would you like a new game?");
-				if(newOne)
-					window.location.reload();
-			} else {
-				// Check whether the turn advances or if the opposite player has no legal moves.
-				if (user) {
-					empty = isEmpty(board, user);
-					if(empty){
-						switchUser();
-						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
-					}
-				}
-				if (!user) {
-					empty = isEmpty(board, user);
-					if (empty) {
-						switchUser();
-						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
-					}
-				}
-			}
 		}
 	}
 }
