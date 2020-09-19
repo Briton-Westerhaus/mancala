@@ -702,7 +702,6 @@ async function animateMove(element) {
 		switchUser();
 
 	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		// TODO: Make it so these happen all at once. 
 		await moveStone(document.getElementById(spot), document.getElementById(6));
 		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
 		board[6].push(board[spot].pop());
@@ -710,14 +709,6 @@ async function animateMove(element) {
 		playAudio(emptyIndex);
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
-
-		/*while (board[12 - spot].length > 0) {
-			await moveStone(document.getElementById(12 - spot), document.getElementById(6));
-			emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
-			board[6].push(board[12 - spot].pop());
-
-			playAudio(emptyIndex);
-		}*/
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		// TODO: Make it so these happen all at once. 
@@ -727,13 +718,7 @@ async function animateMove(element) {
 		
 		playAudio(emptyIndex);
 
-		while (board[12 - spot].length > 0) {
-			await moveStone(document.getElementById(12 - spot), document.getElementById(13));
-			emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
-			board[13].push(board[12 - spot].pop());
-
-			playAudio(emptyIndex);
-		}
+		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
 }
 
@@ -783,13 +768,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			}
 			thisBoard[13].push(thisBoard[moveSquare].pop());
 
-			while (thisBoard[12 - moveSquare].length > 0) {
-				emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
-				if (realUser) {
-					await moveStone(document.getElementById(12 - moveSquare), document.getElementById(13));
-					playAudio(emptyIndex);
+			if (realUser) {
+				await moveStones(document.getElementById(12 - moveSquare), document.getElementById(13));
+			} else {
+				while (thisBoard[12 - moveSquare].length > 0) {
+					thisBoard[13].push(thisBoard[12 - moveSquare].pop());
 				}
-				thisBoard[13].push(thisBoard[12 - moveSquare].pop());
 			}
 		}
 		return;
