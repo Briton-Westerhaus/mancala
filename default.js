@@ -137,9 +137,11 @@ async function moveStone(startPit, endPit) {
  */
 async function moveStones(startPit, endPit) {
 	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance;
-	while (board[startPit.id].length > 0) {
+	let xDistances = [];
+	let yDistances = [];
+	for (let i = 0; i < board[startPit.id].length; i++) {
 		// Starting moving stones
-		stone = startPit.childNodes[startPit.childNodes.length - 1];
+		stone = startPit.childNodes[startPit.childNodes.length - i - 1];
 		xOffset = 0;
 		yOffset = 0;
 
@@ -166,6 +168,9 @@ async function moveStones(startPit, endPit) {
 		yDistance = Math.round(distance * sin) + yOffset;
 		startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
 		startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+
+		xDistances.push(xDistance);
+		yDistances.push(yDistance);
 
 		transform = "translate(" + ((endPit.childNodes[1][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[1][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
 
@@ -198,22 +203,27 @@ async function moveStones(startPit, endPit) {
 				endPit.childNodes[i].style.transition = "transform .3s ease";
 			}); 
 		}
-		
-		startPit.removeChild(stone);
-		stone.setAttribute("x", endPit.childNodes[1][endXProp].baseVal.value - 16 + xDistance);
-		stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistance);
-		stone.style.transform = "translate(0px, 0px)";
-		endPit.append(stone);
 
-		startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
-		endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
-
-		board[endPit.id].push(board[startPit.id].pop());
 		// End moving stones
 	}
-	await new Promise(r => setTimeout(r, 400)); 
+	await new Promise(r => setTimeout(r, 400));
+
+	while (board[startPit.id].length > 0) {
+		stone = startPit.childNodes[startPit.childNodes.length - 1];	
+		startPit.removeChild(stone);
+		stone.setAttribute("x", endPit.childNodes[1][endXProp].baseVal.value - 16 + xDistances.shift());
+		stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistances.shift());
+		stone.style.transform = "translate(0px, 0px)";
+		endPit.append(stone);
+		
+		board[endPit.id].push(board[startPit.id].pop());
+	}
+
+	startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
+	endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
 
 	emptyIndex = getNumStones(board[endPit.id]); // The number of stones also indicates the first empty slot.
+
 	playAudio(emptyIndex);
 }
 
