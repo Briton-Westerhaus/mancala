@@ -139,6 +139,7 @@ async function moveStones(startPit, endPit) {
 	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance;
 	let xDistances = [];
 	let yDistances = [];
+
 	for (let i = 0; i < board[startPit.id].length; i++) {
 		// Starting moving stones
 		stone = startPit.childNodes[startPit.childNodes.length - i - 1];
@@ -166,8 +167,8 @@ async function moveStones(startPit, endPit) {
 		distance = 32 - (32 / (endPit.childNodes.length - 1));
 		xDistance = Math.round(distance * cos) + xOffset;
 		yDistance = Math.round(distance * sin) + yOffset;
-		startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
-		startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+		startX = startPit.childNodes[startPit.childNodes.length - i - 1].x.baseVal.value;
+		startY = startPit.childNodes[startPit.childNodes.length - i - 1].y.baseVal.value;
 
 		xDistances.push(xDistance);
 		yDistances.push(yDistance);
@@ -175,7 +176,6 @@ async function moveStones(startPit, endPit) {
 		transform = "translate(" + ((endPit.childNodes[1][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[1][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
 
 		stone.style.transform =  transform;
-		//await new Promise(r => setTimeout(r, 400)); 
 
 		distance = 32 - distance;
 		angle += 180;
@@ -189,8 +189,6 @@ async function moveStones(startPit, endPit) {
 			endPit.childNodes[i].style.transform = transform;
 			endPit.childNodes[i].style.transition = "transform .1s ease";
 		}
-
-		//await new Promise(r => setTimeout(r, 200)); 
 
 		for (let i = 2; i < endPit.childNodes.length; i++) {
 			endPit.childNodes[i].style.transition = "transform .0s ease";
