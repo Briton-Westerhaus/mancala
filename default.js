@@ -215,7 +215,6 @@ async function moveStones(startPit, endPit) {
 		stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistances.shift());
 		stone.style.transform = "translate(0px, 0px)";
 		endPit.append(stone);
-		
 		board[endPit.id].push(board[startPit.id].pop());
 	}
 
@@ -698,6 +697,8 @@ async function animateMove(element) {
 
 	for (; board[element.id].length > 0;) {
 		spot++;
+		if (spot == (user ? 6 : 13))
+			spot++;
 		if (spot > 13)
 			spot = 0;
 		await moveStone(element, document.getElementById(spot));
@@ -721,7 +722,6 @@ async function animateMove(element) {
 		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		// TODO: Make it so these happen all at once. 
 		await moveStone(document.getElementById(spot), document.getElementById(13));
 		emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
 		board[13].push(board[spot].pop());
@@ -751,6 +751,8 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
+			if (moveSquare == (user ? 6 : 13))
+				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
 			
@@ -791,6 +793,8 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// This is when we're simulating a player turn during recursion. 
 	while (toMove.length > 0) {
 		moveSquare++;
+		if (moveSquare == (user ? 6 : 13))
+			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
 		thisBoard[moveSquare].push(toMove.pop());
