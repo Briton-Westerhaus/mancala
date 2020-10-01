@@ -162,6 +162,18 @@ svg image{
 	padding-left: 90px;
 }
 
+#playerone {
+	position: relative;
+	left: 30px;
+	bottom: 70px;
+}
+
+#playertwo {
+	position: relative;
+	bottom: 230px;
+	left: 105px;
+}
+
 button.help{
     height: 1.5em;
     width: 1.5em;

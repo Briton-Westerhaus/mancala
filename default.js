@@ -695,7 +695,7 @@ async function animateMove(element) {
 
 	for (; board[element.id].length > 0;) {
 		spot++;
-		if (spot == (user ? 6 : 13))
+		if (spot == (user ? 13 : 6))
 			spot++;
 		if (spot > 13)
 			spot = 0;
@@ -749,7 +749,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (user ? 6 : 13))
+			if (moveSquare == (tempUser ? 13 : 6))
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
@@ -791,7 +791,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// This is when we're simulating a player turn during recursion. 
 	while (toMove.length > 0) {
 		moveSquare++;
-		if (moveSquare == (user ? 6 : 13))
+		if (moveSquare == (tempUser ? 13 : 6))
 			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
