@@ -26,55 +26,252 @@ function initializeBoard() {
 	var temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").className = 'currentPlayer';
-	for (var i = 0; i < 6; i++) {
-		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
-			temp = Math.round(3 * Math.random());
-			switch (temp) {
-				case 0:
-					board[i][j] = "blue";
-					break;
-				case 1:
-					board[i][j] = "green";
-					break;
+	for (var i = 0; i < board.length; i++) {
+		board[i] = [];
+		if (i != 6 && i != 13) { // Don't initialize the two caches.
+			for (var j = 0; j < 3; j++) {
+				temp = Math.round(3 * Math.random());
+				switch (temp) {
+					case 0:
+						board[i].push("blue");
+						break;
+					case 1:
+						board[i].push("green");
+						break;
 
-				case 2:
-					board[i][j] = "red";
-					break;
-				case 3:
-					board[i][j] = "yellow";
-					break;
-				default:
-					break;
+					case 2:
+						board[i].push("red");
+						break;
+					case 3:
+						board[i].push("yellow");
+						break;
+					default:
+						break;
+				}
 			}
+			placeStones(document.getElementById(i));
 		}
 	}
-	board[6] = new Array(34);//right cache
-	for (var i = 7; i < 13; i++) {
-		board[i] = new Array(15);
-		for (var j = 0; j < 3; j++) {
-			temp = Math.round(3 * Math.random());
-			switch(temp){
-				case 0:
-					board[i][j] = "blue";
-					break;
-				case 1:
-					board[i][j] = "green";
-					break;
+	//drawBoard();
+}
 
-				case 2:
-					board[i][j] = "red";
-					break;
-				case 3:
-					board[i][j] = "yellow";
-					break;
-				default:
-					break;
-			}
+/**
+ * 
+ * @param {Element} startPit - The beginning pit where the stone is taken from
+ * @param {Element} endPit - The ending pit (or cache) where the stone is placed
+ */
+async function moveStone(startPit, endPit) {
+	let stone = startPit.childNodes[startPit.childNodes.length - 1];
+	//let boardStone = board[startPit.id].pop();
+	let xOffset = 0, yOffset = 0;
+
+	let endXProp = '';
+	let endYProp = '';
+
+	if (endPit.id != 6 && endPit.id != 13) { // pits
+		endXProp = 'c';
+		endYProp = 'c';
+	} else { //caches
+		xOffset += endPit.childNodes[1].width.baseVal.value / 2;
+		yOffset += endPit.childNodes[1].height.baseVal.value / 2;
+	}
+
+	endXProp += 'x';
+	endYProp += 'y';
+
+	let angle = Math.ceil(Math.random() * 360);
+	let sin = Math.sin(angle * Math.PI / 180);
+	let cos = Math.cos(angle * Math.PI / 180)
+	let distance = 32 - (32 / (endPit.childNodes.length - 1));
+	let xDistance = Math.round(distance * cos) + xOffset;
+	let yDistance = Math.round(distance * sin) + yOffset;
+	let startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
+	let startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
+
+	let transform = "translate(" + ((endPit.childNodes[1][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[1][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
+
+	stone.style.transform =  transform;
+	await new Promise(r => setTimeout(r, 400)); 
+
+	distance = 32 - distance;
+	angle += 180;
+	sin = Math.sin(angle * Math.PI / 180);
+	cos = Math.cos(angle * Math.PI / 180)
+	let newXDistance = Math.round(distance * cos);
+	let newYDistance = Math.round(distance * sin);
+	transform = "translate(" + newXDistance.toString() + "px, " + newYDistance.toString() + "px)";
+
+	for (let i = 2; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].style.transform = transform;
+		endPit.childNodes[i].style.transition = "transform .1s ease";
+	}
+
+	await new Promise(r => setTimeout(r, 200)); 
+
+	for (let i = 2; i < endPit.childNodes.length; i++) {
+		endPit.childNodes[i].style.transition = "transform .0s ease";
+		endPit.childNodes[i].style.transform = "translate(0px, 0px)";
+		endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
+		endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
+		new Promise(r => {
+			setTimeout(r, 300);
+		}).then(() => {
+			endPit.childNodes[i].style.transition = "transform .3s ease";
+		}); 
+	}
+	
+	startPit.removeChild(stone);
+	stone.setAttribute("x", endPit.childNodes[1][endXProp].baseVal.value - 16 + xDistance);
+	stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistance);
+	stone.style.transform = "translate(0px, 0px)";
+	endPit.append(stone);
+
+	startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
+	endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
+}
+
+/**
+ * Moves all the stones from one pit to another.
+ * @param {Element} startPit - The pit where the stones move from.
+ * @param {Element} endPit - The pit where the stones move to.
+ */
+async function moveStones(startPit, endPit) {
+	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance;
+	let xDistances = [];
+	let yDistances = [];
+
+	for (let i = 0; i < board[startPit.id].length; i++) {
+		// Starting moving stones
+		stone = startPit.childNodes[startPit.childNodes.length - i - 1];
+		xOffset = 0;
+		yOffset = 0;
+
+
+		endXProp = '';
+		endYProp = '';
+
+		if (endPit.id != 6 && endPit.id != 13) { // pits
+			endXProp = 'c';
+			endYProp = 'c';
+		} else { //caches
+			xOffset += endPit.childNodes[1].width.baseVal.value / 2;
+			yOffset += endPit.childNodes[1].height.baseVal.value / 2;
+		}
+
+		endXProp += 'x';
+		endYProp += 'y';
+
+		angle = Math.ceil(Math.random() * 360);
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		distance = 32 - (32 / (endPit.childNodes.length - 1));
+		xDistance = Math.round(distance * cos) + xOffset;
+		yDistance = Math.round(distance * sin) + yOffset;
+		startX = startPit.childNodes[startPit.childNodes.length - i - 1].x.baseVal.value;
+		startY = startPit.childNodes[startPit.childNodes.length - i - 1].y.baseVal.value;
+
+		xDistances.push(xDistance);
+		yDistances.push(yDistance);
+
+		transform = "translate(" + ((endPit.childNodes[1][endXProp].baseVal.value + xDistance) - startX - 16).toString() + "px, " + ((endPit.childNodes[1][endYProp].baseVal.value + yDistance) - startY - 16).toString() + "px)";
+
+		stone.style.transform =  transform;
+
+		distance = 32 - distance;
+		angle += 180;
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		newXDistance = Math.round(distance * cos);
+		newYDistance = Math.round(distance * sin);
+		transform = "translate(" + newXDistance.toString() + "px, " + newYDistance.toString() + "px)";
+
+		for (let i = 2; i < endPit.childNodes.length; i++) {
+			endPit.childNodes[i].style.transform = transform;
+			endPit.childNodes[i].style.transition = "transform .1s ease";
+		}
+
+		for (let i = 2; i < endPit.childNodes.length; i++) {
+			endPit.childNodes[i].style.transition = "transform .0s ease";
+			endPit.childNodes[i].style.transform = "translate(0px, 0px)";
+			endPit.childNodes[i].setAttribute("x", endPit.childNodes[i].x.baseVal.value + newXDistance);
+			endPit.childNodes[i].setAttribute("y", endPit.childNodes[i].y.baseVal.value + newYDistance);
+			new Promise(r => {
+				setTimeout(r, 300);
+			}).then(() => {
+				endPit.childNodes[i].style.transition = "transform .3s ease";
+			}); 
+		}
+
+		// End moving stones
+	}
+	await new Promise(r => setTimeout(r, 400));
+
+	while (board[startPit.id].length > 0) {
+		stone = startPit.childNodes[startPit.childNodes.length - 1];	
+		startPit.removeChild(stone);
+		stone.setAttribute("x", endPit.childNodes[1][endXProp].baseVal.value - 16 + xDistances.shift());
+		stone.setAttribute("y", endPit.childNodes[1][endYProp].baseVal.value - 16 + yDistances.shift());
+		stone.style.transform = "translate(0px, 0px)";
+		endPit.append(stone);
+		board[endPit.id].push(board[startPit.id].pop());
+	}
+
+	startPit.childNodes[0].innerHTML = startPit.childNodes.length - 2;
+	endPit.childNodes[0].innerHTML = endPit.childNodes.length - 2;
+
+	emptyIndex = getNumStones(board[endPit.id]); // The number of stones also indicates the first empty slot.
+
+	playAudio(emptyIndex);
+}
+
+/**
+ * Places the stones clustered around the center of a pit.
+ * @param {Element} element 
+ */
+function placeStones(element) {
+	const startX = element.childNodes[1].cx.baseVal.value;
+	const startY = element.childNodes[1].cy.baseVal.value;
+	const pit = board[element.id];
+	const numStones = pit.length;
+
+	if (numStones == 0)
+		return;
+	
+	let stones = [];
+	for (let i = 0; i < numStones; i++) {
+		let stone = document.createElementNS("http://www.w3.org/2000/svg", "image");
+		stone.setAttribute("href", pit[i] + "_stone.png");
+		stone.setAttribute("height", 32);
+		stone.setAttribute("width", 32);
+		stones.push(stone);
+	}
+	stones[0].setAttribute("x", startX - 16);
+	stones[0].setAttribute("y", startY - 16);
+	for (let i = 1; i < numStones; i++) {
+		let angle = Math.ceil(Math.random() * 360);
+		let sin = Math.sin(angle * Math.PI / 180);
+		let cos = Math.cos(angle * Math.PI / 180)
+		let distance = 32 - (32 / (i + 1));
+		let xDistance = Math.round(distance * cos);
+		let yDistance = Math.round(distance * sin);
+		stones[i].setAttribute("x", startX - 16 + xDistance);
+		stones[i].setAttribute("y", startY - 16 + yDistance);
+
+		distance = 32 - distance;
+		angle += 180;
+		sin = Math.sin(angle * Math.PI / 180);
+		cos = Math.cos(angle * Math.PI / 180)
+		xDistance = Math.round(distance * cos);
+		yDistance = Math.round(distance * sin);
+
+		for (let j = i - 1; j >= 0; j--) {
+			stones[j].setAttribute("x", stones[j].x.baseVal.value + xDistance);
+			stones[j].setAttribute("y", stones[j].y.baseVal.value + yDistance);
 		}
 	}
-	board[13] = new Array(34);//left cache
-	drawBoard();
+	for (let i = 0; i < numStones; i++) {
+		element.append(stones[i]);
+	}
 }
 
 /**
@@ -97,12 +294,115 @@ function drawBoard() {
  * Handles a human turn.
  * @param {Element} element - The pit or cache clicked by the user.
  */
-function humanTurn(element){
+async function humanTurn(element) {
 	//this is called when a player clicks on a board square
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
-	moveStones(element);
+
+	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
+		await animateMove(element);
+		switchUser();
+		//drawBoard();
+	} else {
+		return false;
+	}
+	// Recalculate scores
+	scores[0] = 0;
+	scores[1] = 0;
+
+	for (let i = 0; i < 34; i++) {
+		if(board[6][i] != null && board[6][i] != "")
+			scores[0]++;
+	}
+
+	for (let i = 0; i < 34; i++) {
+		if(board[13][i] != null && board[13][i] != "")
+			scores[1]++;
+	}
+
+	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
+	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+	// Check for the end of the game.
+	if (scores[0] + scores[1] == 36) {
+		var newOne;
+		if (scores[0] > scores[1])
+			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+		if (scores[0] < scores[1])
+			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
+		if (scores[0] == scores[1])
+			newOne = confirm("The game is a tie!\n  Would you like a new game?");
+		if (newOne)
+			window.location.reload();
+	} else {
+		// Check whether the turn advances or if the opposite player has no legal moves.
+		var empty;
+		if (user) {
+			empty = isEmpty(board, user);
+			if (empty) {
+				switchUser();
+				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
+			}
+		}
+
+		if (!user) {
+			empty = isEmpty(board, user);
+			if (empty) {
+				switchUser();
+				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+			}
+		}
+		
+		// Perform computer move.
+		if (players == 1 && !user) {
+			//drawBoard();
+			await computerTurn();
+
+			// Calculate scores
+			scores[0] = 0;
+			scores[1] = 0;
+			for (let i = 0; i < 34; i++) {
+				if(board[6][i] != null && board[6][i] != "")
+					scores[0]++;
+			}
+			for (let i = 0; i < 34; i++) {
+				if(board[13][i] != null && board[13][i] != "")
+					scores[1]++;
+			}
+			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
+			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+			// Check for the end of the game.
+			if (scores[0] + scores[1] == 36) {
+				var newOne;
+				if(scores[0] > scores[1])
+					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+				if(scores[0] < scores[1])
+					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
+				if(scores[0] == scores[1])
+					newOne = confirm("The game is a tie!\n  Would you like a new game?");
+				if(newOne)
+					window.location.reload();
+			} else {
+				// Check whether the turn advances or if the opposite player has no legal moves.
+				if (user) {
+					empty = isEmpty(board, user);
+					if(empty){
+						switchUser();
+						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
+					}
+				}
+				if (!user) {
+					empty = isEmpty(board, user);
+					if (empty) {
+						switchUser();
+						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+					}
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -115,7 +415,7 @@ async function computerTurn() {
 	var empty;
 	user = !user;
 	while (user) {
-		drawBoard();
+		//drawBoard();
 		maxMoveVal = -37;
 		moveVal = -37;
 		for (var i = 7; i < 13; i++) {
@@ -141,7 +441,7 @@ async function computerTurn() {
 				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
 		}
-		drawBoard();
+		//drawBoard();
 	}
 	switchUser();
 }
@@ -209,10 +509,11 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 
 /**
  * Gets the number of stones in a pit/cache given a board.
- * @param {Array.<String>} theBoard - An array denoting the color of stones in the pit or cache. 
+ * @param {Array.<String>} pit - An array denoting the color of stones in the pit or cache. 
  */
 function getNumStones(pit) {
-	return pit.findIndex(function(stone) { return !stone; });
+	return pit.length; // This might be totally unneccessary. 
+	// return pit.findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -386,25 +687,22 @@ function getTransform(oldPit, newPit, oldIndex, newIndex) {
  */
 async function animateMove(element) {
 	// Move stones to temporary array.
-	var toMove = new Array(15);
-	for (let i = 0; i < 15; i++) {
-		toMove[i] = board[element.id][i];
-		board[element.id][i] = "";
-	}
+	//let toMove = board[element.id];
+	//board[element.id] = [];
 
 	var spot = element.id;
 	let emptyIndex;
 
-	for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+	for (; board[element.id].length > 0;) {
 		spot++;
+		if (spot == (user ? 13 : 6))
+			spot++;
 		if (spot > 13)
 			spot = 0;
-		
+		await moveStone(element, document.getElementById(spot));
 		emptyIndex = getNumStones(board[spot]); // The number of stones also indicates the first empty slot.
-		board[spot][emptyIndex] = toMove[j];
-		document.getElementById(element.id + "." + j).style.transform = getTransform(element.id, spot, j, emptyIndex);
+		board[spot].push(board[element.id].pop());
 
-		await new Promise(r => setTimeout(r, 400));
 		playAudio(emptyIndex);
 	}
 
@@ -413,155 +711,22 @@ async function animateMove(element) {
 		switchUser();
 
 	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		for (var i = 0; i < 15; i++) {
-			toMove[i] = board[12 - spot][i];
-			board[12 - spot][i] = "";
-		}
-		var j = 0;
-		for (let i = 0; i < board[6].length; i++) {
-			if (board[6][i] == "" || board[6][i] == null) {
-				if (board[spot][0] != null && board[spot][0] != "") {
-					board[6][i] = board[spot][0];
-					board[spot][0] = "";
-					i++;
-				}
-				board[6][i] = toMove[j];
-				j++;
-				if(toMove[j] == null || toMove[j] == "")
-					i = board[6].length;
-			}
-		}
+		await moveStone(document.getElementById(spot), document.getElementById(6));
+		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
+		board[6].push(board[spot].pop());
+		
+		playAudio(emptyIndex);
+
+		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
 	}
 	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
-		for (let i = 0; i < 15; i++) {
-			toMove[i] = board[12 - spot][i];
-			board[12 - spot][i] = "";
-		}
-		var j = 0;
-		for (let i = 0; i < board[13].length; i++) {
-			if (board[13][i] == "" || board[13][i] == null) {
-				if (board[spot][0] != null && board[spot][0] != "") {
-					board[13][i] = board[spot][0];
-					board[spot][0] = "";
-					i++;
-				}
-				board[13][i] = toMove[j];
-				j++;
-				if (toMove[j] == null || toMove[j] == "")
-					i = board[13].length;
-			}
-		}
-	}
-}
-
-/**
- * Handles a move and calculates the end of a game. 
- * @param {Element} element - The pit of the move.
- */
-async function moveStones(element) {
-	
-	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
-		await animateMove(element);
-		switchUser();
-		drawBoard();
-	} else {
-		return false;
-	}
-	// Recalculate scores
-	scores[0] = 0;
-	scores[1] = 0;
-
-	for (let i = 0; i < 34; i++) {
-		if(board[6][i] != null && board[6][i] != "")
-			scores[0]++;
-	}
-
-	for (let i = 0; i < 34; i++) {
-		if(board[13][i] != null && board[13][i] != "")
-			scores[1]++;
-	}
-
-	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
-	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
-
-	// Check for the end of the game.
-	if (scores[0] + scores[1] == 36) {
-		var newOne;
-		if (scores[0] > scores[1])
-			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
-		if (scores[0] < scores[1])
-			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
-		if (scores[0] == scores[1])
-			newOne = confirm("The game is a tie!\n  Would you like a new game?");
-		if (newOne)
-			window.location.reload();
-	} else {
-		// Check whether the turn advances or if the opposite player has no legal moves.
-		var empty;
-		if (user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
-			}
-		}
-
-		if (!user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
-			}
-		}
+		await moveStone(document.getElementById(spot), document.getElementById(13));
+		emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
+		board[13].push(board[spot].pop());
 		
-		// Perform computer move.
-		if (players == 1 && !user) {
-			drawBoard();
-			await computerTurn();
+		playAudio(emptyIndex);
 
-			// Calculate scores
-			scores[0] = 0;
-			scores[1] = 0;
-			for (let i = 0; i < 34; i++) {
-				if(board[6][i] != null && board[6][i] != "")
-					scores[0]++;
-			}
-			for (let i = 0; i < 34; i++) {
-				if(board[13][i] != null && board[13][i] != "")
-					scores[1]++;
-			}
-			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
-			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
-
-			// Check for the end of the game.
-			if (scores[0] + scores[1] == 36) {
-				var newOne;
-				if(scores[0] > scores[1])
-					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
-				if(scores[0] < scores[1])
-					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
-				if(scores[0] == scores[1])
-					newOne = confirm("The game is a tie!\n  Would you like a new game?");
-				if(newOne)
-					window.location.reload();
-			} else {
-				// Check whether the turn advances or if the opposite player has no legal moves.
-				if (user) {
-					empty = isEmpty(board, user);
-					if(empty){
-						switchUser();
-						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
-					}
-				}
-				if (!user) {
-					empty = isEmpty(board, user);
-					if (empty) {
-						switchUser();
-						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
-					}
-				}
-			}
-		}
+		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
 }
 
@@ -576,68 +741,61 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	const initialMoveSquare = moveSquare;
 	
 	// Move stones to temporary array.
-	var toMove = new Array(15);
-
-	for (let i = 0; i < 15; i++) {
-		toMove[i] = thisBoard[moveSquare][i];
-		thisBoard[moveSquare][i] = "";
-	}
+	let toMove = thisBoard[moveSquare];
+	thisBoard[moveSquare] = [];
 	
 	if ((user && realUser) || (!realUser && tempUser)) {
 		// Move the stones.
 		let emptyIndex;
-		for (let j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+		while (toMove.length > 0) {
 			moveSquare++;
+			if (moveSquare == (tempUser ? 13 : 6))
+				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
 			
-			emptyIndex = getNumStones(thisBoard[moveSquare]);
-			thisBoard[moveSquare][emptyIndex] = toMove[j];
+			emptyIndex = getNumStones(thisBoard[moveSquare]); // The number of stones also indicates the first empty slot.
 			if (realUser) {
-				document.getElementById(initialMoveSquare + "." + j).style.transform = getTransform(initialMoveSquare, moveSquare, j, emptyIndex);
-				await new Promise(r => setTimeout(r, 400));
+				await moveStone(document.getElementById(initialMoveSquare), document.getElementById(moveSquare));
 				playAudio(emptyIndex);
 			}
+			thisBoard[moveSquare].push(toMove.pop());
 		}
 		// Computer ended in their cache. They have another turn. 
 		if (moveSquare == 13) {
-			if(realUser)
+			if (realUser)
 				user = !user;
 			else
 				tempUser = !tempUser;
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			
-			let emptyIndex;
-
-			// Move stones to temporary array. 
-			for (let i = 0; i < 15; i++) {
-				toMove[i] = thisBoard[12 - moveSquare][i];
-				thisBoard[12 - moveSquare][i] = "";
+			// TODO: Make it so these happen all at once. 
+			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
+			if (realUser) {
+				await moveStone(document.getElementById(moveSquare), document.getElementById(13));
+				playAudio(emptyIndex);
 			}
-			emptyIndex = getNumStones(thisBoard[13]);
-			
-			// Move the last moved stone to the cache.
-			thisBoard[13][emptyIndex] = thisBoard[moveSquare][0];
-			thisBoard[moveSquare][0] = "";
-			emptyIndex++;
+			thisBoard[13].push(thisBoard[moveSquare].pop());
 
-			// Do the actual moving.
-			for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
-				thisBoard[13][emptyIndex] = toMove[i];
+			if (realUser) {
+				await moveStones(document.getElementById(12 - moveSquare), document.getElementById(13));
+			} else {
+				while (thisBoard[12 - moveSquare].length > 0) {
+					thisBoard[13].push(thisBoard[12 - moveSquare].pop());
+				}
 			}
 		}
 		return;
 	}
 	// This is when we're simulating a player turn during recursion. 
-	let emptyIndex;
-	for(j = 0; toMove[j] != "" && toMove[j] != null; j++) {
+	while (toMove.length > 0) {
 		moveSquare++;
+		if (moveSquare == (tempUser ? 13 : 6))
+			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
-		emptyIndex = getNumStones(board[moveSquare]); // The number of stones also indicates the first empty slot.
-		thisBoard[moveSquare][emptyIndex] = toMove[j];
+		thisBoard[moveSquare].push(toMove.pop());
 	}
 	// The final stone ends in the cache, so the player gets another turn. 
 	if (moveSquare == 6) {
@@ -649,25 +807,17 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 
 	// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 	if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-
-		let emptyIndex;
 		
-		// Move stones to temporary array. 
-		for(let i = 0; i < 15; i++) {
-			toMove[i] = thisBoard[6 + moveSquare][i];
-			thisBoard[6 + moveSquare][i] = "";
-		}
-
-		emptyIndex = getNumStones(thisBoard[6]);
+		// Move stones to temporary array.
+		toMove = thisBoard[6 + moveSquare];
+		thisBoard[6 + moveSquare] = [];
 			
 		// Move the last moved stone to the cache.
-		thisBoard[6][emptyIndex] = thisBoard[moveSquare][0];
-		thisBoard[moveSquare][0] = "";
-		emptyIndex++;
+		thisBoard[6].push(thisBoard[moveSquare].pop());
 
 		// Do the actual moving.
-		for (let i = 0; i < toMove.length && toMove[i] != "" && toMove[i] != null; i++, emptyIndex++) {
-			thisBoard[6][emptyIndex] = toMove[i];
+		while (toMove.length > 0) {
+			thisBoard[6].push(toMove.pop());
 		}
 	}
 }

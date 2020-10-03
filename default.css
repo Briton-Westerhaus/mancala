@@ -46,21 +46,25 @@ h3 {
 td.cache {
 	padding-left: 38.5px;
 	padding-right: 38.5px;
-	background-image: url("cache.jpg");
+	/*background-image: url("cache.jpg");*/
 }
 
 table.cache {
 	width: 45px;
-	height: 292px;
+	height: 326px;
 }
 
 .wholeboard {
-	width: 610px;
-	height: 292px;
+	width: 1055px;
+	height: 326px;
+	background-image: url("board.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: 90px;
 }
 
 .select {
-	height: 292px;
+	height: 326px;
 	width: 90px;
 }
 
@@ -85,27 +89,31 @@ td {
 
 .board {
 	width: 366px;
-	height: 292px;
+	height: 326px;
 }
 
 .square {
 	width: 61px;
 	height: 146px;
-	background-image: url("board_square.jpg");
+	/*background-image: url("board_square.jpg");*/
 }
 
 .slot {
-	width: 15px;
-	height: 15px;
+	width: 32px;
+	height: 32px;
 	transition: transform .3s ease;
 	/*transform: translate(61px, 0px);*/
+}
+
+svg image{
+	transition: transform .3s ease;
 }
 
 .leftcolumn {
 	vertical-align: center;
 	position: relative;
-	left: 15px;
-	width: 15px;
+	left: 32px;
+	width: 32px;
 	height: 105px;
 }
 
@@ -113,25 +121,25 @@ td {
 	vertical-align:center;
 	position:relative;
 	right:0px;
-	width:15px;
+	width:32px;
 	height:120px;
 }
 
 .leftcache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 165px;
 }
 
 .middlecache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 180px;
 }
 
 .rightcache {
 	vertical-align: center;
-	width: 15px;
+	width: 32px;
 	height: 165px;
 }
 
@@ -152,6 +160,18 @@ td {
 #player2 {
 	float: left;
 	padding-left: 90px;
+}
+
+#playerone {
+	position: relative;
+	left: 30px;
+	bottom: 70px;
+}
+
+#playertwo {
+	position: relative;
+	bottom: 230px;
+	left: 105px;
 }
 
 button.help{
