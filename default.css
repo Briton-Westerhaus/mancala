@@ -144,13 +144,18 @@ svg image{
 }
 
 .currentPlayer {
-	background-color: yellow;
+	border: 2px solid darkgray;
+	background-color: rgb(245, 245, 245);
 }
 
 #player1, #player2 {
 	display: inline-block;
 	width: auto;
 	object-fit: contain;
+	font-weight: normal;
+	padding: 3px;
+	border-radius: 6px;
+
 }
 
 #player1 {
