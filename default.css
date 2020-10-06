@@ -144,8 +144,12 @@ svg image{
 }
 
 .currentPlayer {
-	border: 2px solid darkgray;
-	background-color: rgb(245, 245, 245);
+	box-shadow: inset 0px 0px 4px 4px rgba(255, 255, 255, .8);
+}
+
+.scoreContainer{
+	width: 965px;
+	float: right;
 }
 
 #player1, #player2 {
@@ -155,7 +159,8 @@ svg image{
 	font-weight: normal;
 	padding: 3px;
 	border-radius: 6px;
-
+	border: 2px solid darkgray;
+	background-color: lightgray;
 }
 
 #player1 {
@@ -164,7 +169,6 @@ svg image{
 
 #player2 {
 	float: left;
-	padding-left: 90px;
 }
 
 #playerone {
