@@ -251,3 +251,11 @@ button.help{
 	text-align: left;
 	margin-bottom: 1em;
 }
+
+g {
+	cursor: pointer;
+}
+
+g:hover circle {
+	fill: url(#PitHoverGradient);
+}

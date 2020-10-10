@@ -39,6 +39,12 @@
 				<img src="arrow.png" id="playertwo" style="visibility:hidden" />
 				<img src="arrow.png" id="playerone" />
 				<svg class="wholeboard" width="1055" height="326" id="GameBoard">
+					<defs>
+						<radialGradient id="PitHoverGradient">
+						  <stop offset="60%" stop-color="white" stop-opacity=".5" />
+						  <stop offset="100%" stop-color="white" stop-opacity="0" />
+						</radialGradient>
+					  </defs>
 					<!-- Bottom Row -->
 					<g onclick="humanTurn(this);" id="0"><title>3</title><circle cx="278" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
 					<g onclick="humanTurn(this);" id="1"><title>3</title><circle cx="383" cy="230" r="49" fill="rgba(255, 255, 255, 0)" /></g>
@@ -61,13 +67,13 @@
 			<!--end game board-->
 			<script type="text/javascript">initializeBoard();</script>
 			</div>
-			<div id="ModalContainer">
-				<div class="modal">
-					<h3>How to play:</h3>
-					<p>The goal of the game is to have the most stones in your cache at the end of the game.  There are four colors of stones but they are all the same.</p>
-					<p>To take a turn, click on a pit on your side of the board (bottom for player 1, top for player 2).  The stones will be placed one at a time in the pits in a counter-clockwise fashion.  If your last stone lands in your cache, you get another turn.  If your last stone lands in an empty pit on your side, that stone and all the stones opposite are placed in your cache.</p>
-					<button onclick="hideModal()">&#10004;</button>
-				</div>
+		</div>
+		<div id="ModalContainer">
+			<div class="modal">
+				<h3>How to play:</h3>
+				<p>The goal of the game is to have the most stones in your cache at the end of the game.  There are four colors of stones but they are all the same.</p>
+				<p>To take a turn, click on a pit on your side of the board (bottom for player 1, top for player 2).  The stones will be placed one at a time in the pits in a counter-clockwise fashion.  If your last stone lands in your cache, you get another turn.  If your last stone lands in an empty pit on your side, that stone and all the stones opposite are placed in your cache.</p>
+				<button onclick="hideModal()">&#10004;</button>
 			</div>
 		</div>
 	</body>
