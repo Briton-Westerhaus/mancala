@@ -144,7 +144,8 @@ svg image{
 }
 
 .currentPlayer {
-	box-shadow: inset 0px 0px 4px 4px rgba(255, 255, 255, .8);
+	background-color:rgba(255, 241, 127, .8);
+	box-shadow: 0px 0px 12px 6px rgba(255, 241, 127, .8);
 }
 
 .scoreContainer{
@@ -157,10 +158,8 @@ svg image{
 	width: auto;
 	object-fit: contain;
 	font-weight: normal;
-	padding: 3px;
-	border-radius: 6px;
-	border: 2px solid darkgray;
-	background-color: lightgray;
+	padding: 4px;
+	border-radius: 8px;
 }
 
 #player1 {
