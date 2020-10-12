@@ -53,13 +53,24 @@ function initializeBoard() {
 		}
 	}
 	//drawBoard();
+	activatePits();
 }
 
 /**
  * Sets pits to active or inactive, enabling the indicators of a move.
  */
 function activatePits() {
-	
+	let elem;
+	for (let i = 0; i < 13; i++) {
+		if (i != 6) { // Skip cache
+			elem = document.getElementById(i);
+			if ((board[i].length > 0) && ((user && i >= 0 && i < 6) || (!user && players > 1 && i >= 7 && i < 13))){
+				elem.setAttribute("class", "active-pit");
+			} else {
+				elem.setAttribute("class", "");
+			}
+		}
+	}
 }
 
 /**
@@ -310,6 +321,7 @@ async function humanTurn(element) {
 	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
 		await animateMove(element);
 		switchUser();
+		activatePits();
 		//drawBoard();
 	} else {
 		return false;
@@ -451,6 +463,7 @@ async function computerTurn() {
 		//drawBoard();
 	}
 	switchUser();
+	activatePits();
 }
 
 /**
@@ -735,6 +748,8 @@ async function animateMove(element) {
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
+
+	activatePits();
 }
 
 /**
