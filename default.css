@@ -252,10 +252,10 @@ button.help{
 	margin-bottom: 1em;
 }
 
-g {
+.active-pit {
 	cursor: pointer;
 }
 
-g:hover circle {
+.active-pit:hover circle {
 	fill: url(#PitHoverGradient);
 }

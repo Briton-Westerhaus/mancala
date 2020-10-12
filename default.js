@@ -56,7 +56,14 @@ function initializeBoard() {
 }
 
 /**
- * 
+ * Sets pits to active or inactive, enabling the indicators of a move.
+ */
+function activatePits() {
+	
+}
+
+/**
+ * Moves a stone from one pit to another, including all the animation
  * @param {Element} startPit - The beginning pit where the stone is taken from
  * @param {Element} endPit - The ending pit (or cache) where the stone is placed
  */
