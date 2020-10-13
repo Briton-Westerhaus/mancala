@@ -170,16 +170,12 @@ svg image{
 	float: left;
 }
 
-#playerone {
+#PlayerIndicator {
 	position: relative;
 	left: 30px;
 	bottom: 70px;
-}
-
-#playertwo {
-	position: relative;
-	bottom: 230px;
-	left: 105px;
+	transition: left .1s ease;
+	transition: bottom .1s ease;
 }
 
 button.help{

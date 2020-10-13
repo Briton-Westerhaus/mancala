@@ -320,7 +320,7 @@ async function humanTurn(element) {
 
 	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
 		await animateMove(element);
-		switchUser();
+		await switchUser();
 		activatePits();
 		//drawBoard();
 	} else {
@@ -462,7 +462,7 @@ async function computerTurn() {
 		}
 		//drawBoard();
 	}
-	switchUser();
+	await switchUser();
 	activatePits();
 }
 
@@ -539,21 +539,20 @@ function getNumStones(pit) {
 /**
  * Actually switches the user once their turn is done.
  */
-function switchUser() {
+async function switchUser() {
 	user = !user;
 	if (user) {
 		document.getElementById("player1").className = "currentPlayer";
 		document.getElementById("player2").className = "";
-		document.getElementById("playerone").style.visibility="visible";
-		document.getElementById("playertwo").style.visibility="hidden";
-	}
-	if (!user) {
+		document.getElementById("PlayerIndicator").style.left = "30px";
+		document.getElementById("PlayerIndicator").style.bottom = "70px";
+	} else {
 		document.getElementById("player2").className = "currentPlayer";
 		document.getElementById("player1").className = "";
-		document.getElementById("playertwo").style.visibility="visible";
-		document.getElementById("playerone").style.visibility="hidden";
+		document.getElementById("PlayerIndicator").style.left = "30px";
+		document.getElementById("PlayerIndicator").style.bottom = "230px";
 	}
-
+	await new Promise(r => setTimeout(r, 100)); 
 }
 
 /**
