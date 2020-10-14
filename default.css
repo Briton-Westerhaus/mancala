@@ -173,7 +173,7 @@ svg image{
 #PlayerIndicator {
 	position: relative;
 	left: 30px;
-	bottom: 70px;
+	bottom: 85px;
 	transition: left .1s ease;
 	transition: bottom .1s ease;
 }

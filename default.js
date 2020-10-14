@@ -545,12 +545,12 @@ async function switchUser() {
 		document.getElementById("player1").className = "currentPlayer";
 		document.getElementById("player2").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
-		document.getElementById("PlayerIndicator").style.bottom = "70px";
+		document.getElementById("PlayerIndicator").style.bottom = "85px";
 	} else {
 		document.getElementById("player2").className = "currentPlayer";
 		document.getElementById("player1").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
-		document.getElementById("PlayerIndicator").style.bottom = "230px";
+		document.getElementById("PlayerIndicator").style.bottom = "235px";
 	}
 	await new Promise(r => setTimeout(r, 100)); 
 }
