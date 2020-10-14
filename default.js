@@ -770,7 +770,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (tempUser ? 13 : 6))
+			if (moveSquare == (tempUser ? 6 : 13)) // This is backwards because I'm dumb?
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
