@@ -144,13 +144,22 @@ svg image{
 }
 
 .currentPlayer {
-	background-color: yellow;
+	background-color:rgba(255, 241, 127, .8);
+	box-shadow: 0px 0px 12px 6px rgba(255, 241, 127, .8);
+}
+
+.scoreContainer{
+	width: 965px;
+	float: right;
 }
 
 #player1, #player2 {
 	display: inline-block;
 	width: auto;
 	object-fit: contain;
+	font-weight: normal;
+	padding: 4px;
+	border-radius: 8px;
 }
 
 #player1 {
@@ -159,19 +168,14 @@ svg image{
 
 #player2 {
 	float: left;
-	padding-left: 90px;
 }
 
-#playerone {
+#PlayerIndicator {
 	position: relative;
 	left: 30px;
-	bottom: 70px;
-}
-
-#playertwo {
-	position: relative;
-	bottom: 230px;
-	left: 105px;
+	bottom: 85px;
+	transition: left .1s ease;
+	transition: bottom .1s ease;
 }
 
 button.help{
@@ -242,4 +246,12 @@ button.help{
 .modal p {
 	text-align: left;
 	margin-bottom: 1em;
+}
+
+.active-pit {
+	cursor: pointer;
+}
+
+.active-pit:hover circle {
+	fill: url(#PitHoverGradient);
 }
