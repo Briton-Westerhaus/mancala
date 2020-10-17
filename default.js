@@ -1,9 +1,14 @@
-var board = new Array(14);
-var user = true; // player one
-var players;
-var difficulty;
-var scores =  [0, 0];
-var names = Array(2);
+let board = new Array(14);
+let user = true; // player one
+let players;
+let difficulty;
+let scores =  [0, 0];
+let names = Array(2);
+let recursiveDepth;
+let missedMovesPercentage;
+
+const recursiveDepths = [0, 2, 3, 5, 7];
+const missedMovesPercentages = [1, .3, .15, .05, 0];
 
 /**
  * Shows the help modal.
@@ -23,13 +28,13 @@ function hideModal() {
  * Sets all the variables for the game then places the stones on the board with the drawBoard() function.
  */
 function initializeBoard() {
-	var temp;
+	let temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").className = 'currentPlayer';
-	for (var i = 0; i < board.length; i++) {
+	for (let i = 0; i < board.length; i++) {
 		board[i] = [];
 		if (i != 6 && i != 13) { // Don't initialize the two caches.
-			for (var j = 0; j < 3; j++) {
+			for (let j = 0; j < 3; j++) {
 				temp = Math.round(3 * Math.random());
 				switch (temp) {
 					case 0:
@@ -296,8 +301,8 @@ function placeStones(element) {
  * Places or removes stones from the board
  */
 function drawBoard() {
-	for (var i = 0; i < 14; i++) {
-		for (var j = 0; j < board[i].length; j++) {
+	for (let i = 0; i < 14; i++) {
+		for (let j = 0; j < board[i].length; j++) {
 			if (board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow") {
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url('" + board[i][j] + "_stone.png')";
 			} else {
@@ -345,9 +350,9 @@ async function humanTurn(element) {
 
 	// Check for the end of the game.
 	if (scores[0] + scores[1] == 36) {
-		var newOne;
+		let newOne;
 		if (scores[0] > scores[1])
-			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+			newOne = confirm("" + (players == 1 ? "You Win!" : names[0] + " wins!") + "\n  Would you like a new game?");
 		if (scores[0] < scores[1])
 			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
 		if (scores[0] == scores[1])
@@ -356,7 +361,7 @@ async function humanTurn(element) {
 			window.location.reload();
 	} else {
 		// Check whether the turn advances or if the opposite player has no legal moves.
-		var empty;
+		let empty;
 		if (user) {
 			empty = isEmpty(board, user);
 			if (empty) {
@@ -394,9 +399,9 @@ async function humanTurn(element) {
 
 			// Check for the end of the game.
 			if (scores[0] + scores[1] == 36) {
-				var newOne;
+				let newOne;
 				if(scores[0] > scores[1])
-					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+					newOne = confirm("" + (players == 1 ? "You Win!" : names[0] + " wins!") + "\n  Would you like a new game?");
 				if(scores[0] < scores[1])
 					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
 				if(scores[0] == scores[1])
@@ -428,16 +433,16 @@ async function humanTurn(element) {
  * Executes the computer turn.
  */
 async function computerTurn() {
-	var maxMoveVal;
-	var moveVal;
-	var maxMove;
-	var empty;
+	let maxMoveVal;
+	let moveVal;
+	let maxMove;
+	let empty;
 	user = !user;
 	while (user) {
 		//drawBoard();
 		maxMoveVal = -37;
 		moveVal = -37;
-		for (var i = 7; i < 13; i++) {
+		for (let i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
 				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user);
 				if (moveVal > maxMoveVal) {
@@ -474,12 +479,12 @@ async function computerTurn() {
  * @param {Boolean} temporUser - The temporary user: true is player one, false is player two.
  */
 async function computerTurnRecurse(tempBoard, move, level, temporUser) {
-	var tempUser = !temporUser;
-	var maxMoveVal = 36;
-	var moveVal = 36;
-	var maxMove;
-	var otherMaxMove;
-	var empty = isEmpty(tempBoard, !temporUser);
+	let tempUser = !temporUser;
+	let maxMoveVal = 36;
+	let moveVal = 36;
+	let maxMove;
+	let otherMaxMove;
+	let empty = isEmpty(tempBoard, !temporUser);
 	if (empty)
 		tempUser = !tempUser;
 	empty = (empty && isEmpty(tempBoard, temporUser));
@@ -487,12 +492,16 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 		await computerMove(tempBoard, move, tempUser, false);
 		temporUser = tempUser;
 		if (temporUser) {
-			for (var i = 0; i < 6; i++) {
-				if (level == difficulty || empty) {
+			for (let i = 0; i < 6; i++) {
+				if (level == recursiveDepth || empty) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					} else {
+						moveVal = -36
+					}
 					if (moveVal <= maxMoveVal) {
 						otherMaxMove = maxMove;
 						maxMoveVal = moveVal;
@@ -504,12 +513,16 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 		if (!temporUser) {
 			maxMoveVal = -36;
 			moveVal = -36;
-			for (var i = 7; i < 13; i++) {
-				if (level == difficulty || empty) {
+			for (let i = 7; i < 13; i++) {
+				if (level == recursiveDepth || empty) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+					} else {
+						moveVal = -36
+					}
 					if(moveVal >= maxMoveVal){
 						maxMove = i;
 						maxMoveVal = moveVal;
@@ -564,7 +577,7 @@ function setPlayers(howMany) {
 	document.getElementById("startgame").innerHTML = "";
 	document.getElementById("startgame").style.visiblity = "hidden";
 	names[0] = prompt("What is your name (player 1)?");
-	if (names[0] == null)
+	if (!names[0])
 		names[0] = "Player 1";
 	if (howMany == 1) {
 		document.getElementById("difficulty").style.visibility = "visible";
@@ -573,7 +586,7 @@ function setPlayers(howMany) {
 		document.getElementById("game").style.visibility = "visible";
 		document.getElementById("difficulty").innerHTML = "";
 		names[1] = prompt("What is your name (player 2)?");
-		if (names[1] == null)
+		if (!names[1])
 			names[1] = "Player 2";
 	}
 	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
@@ -611,6 +624,8 @@ function playAudio(numStones) {
  */
 function setDifficulty(howHard) {
 	difficulty = howHard;
+	recursiveDepth = recursiveDepths[difficulty];
+	missedMovesPercentage = missedMovesPercentages[difficulty];
 	document.getElementById("difficulty").style.visiblity = "hidden";
 	document.getElementById("difficulty").innerHTML = "";
 	document.getElementById("game").style.visibility = "visible";
@@ -709,7 +724,7 @@ async function animateMove(element) {
 	//let toMove = board[element.id];
 	//board[element.id] = [];
 
-	var spot = element.id;
+	let spot = element.id;
 	let emptyIndex;
 
 	for (; board[element.id].length > 0;) {
@@ -848,8 +863,8 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
  * @param {Array.<Array.<String>>} theBoard 
  */
 function copyBoard(theBoard) {
-	var returnBoard = Array(theBoard.length);
-	for (var i = 0; i < theBoard.length; i++){
+	let returnBoard = Array(theBoard.length);
+	for (let i = 0; i < theBoard.length; i++){
 		returnBoard[i] = theBoard[i].slice();
 	}
 	return returnBoard;
@@ -861,8 +876,8 @@ function copyBoard(theBoard) {
  * @param {Boolean} theUser - The active player, true for player one.
  */
 function isEmpty(theBoard, theUser) {
-	var i = 0;
-	var max = 6;
+	let i = 0;
+	let max = 6;
 	if (!theUser) {
 		i = 7;
 		max = 13;

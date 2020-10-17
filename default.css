@@ -255,3 +255,10 @@ button.help{
 .active-pit:hover circle {
 	fill: url(#PitHoverGradient);
 }
+
+#startgame button, #difficulty button {
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
