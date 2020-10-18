@@ -366,7 +366,7 @@ async function humanTurn(element) {
 			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
-				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
+				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
 			}
 		}
 
@@ -374,7 +374,7 @@ async function humanTurn(element) {
 			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
-				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
 			}
 		}
 		
@@ -414,14 +414,14 @@ async function humanTurn(element) {
 					empty = isEmpty(board, user);
 					if(empty){
 						switchUser();
-						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
+						alert("It is still " + names[1] + "'s turn because " + (players == 1 ? "you have" : names[0] + " has") + " no legal moves.");
 					}
 				}
 				if (!user) {
 					empty = isEmpty(board, user);
 					if (empty) {
 						switchUser();
-						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+						alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
 					}
 				}
 			}
