@@ -332,21 +332,13 @@ async function humanTurn(element) {
 		return false;
 	}
 	// Recalculate scores
-	scores[0] = 0;
-	scores[1] = 0;
-
-	for (let i = 0; i < 34; i++) {
-		if(board[6][i] != null && board[6][i] != "")
-			scores[0]++;
-	}
-
-	for (let i = 0; i < 34; i++) {
-		if(board[13][i] != null && board[13][i] != "")
-			scores[1]++;
-	}
+	scores[0] = getNumStones(board[6]);
+	scores[1] = getNumStones(board[13]);
 
 	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+	await new Promise(r => setTimeout(r, 100));
 
 	// Check for the end of the game.
 	if (scores[0] + scores[1] == 36) {
@@ -384,18 +376,13 @@ async function humanTurn(element) {
 			await computerTurn();
 
 			// Calculate scores
-			scores[0] = 0;
-			scores[1] = 0;
-			for (let i = 0; i < 34; i++) {
-				if(board[6][i] != null && board[6][i] != "")
-					scores[0]++;
-			}
-			for (let i = 0; i < 34; i++) {
-				if(board[13][i] != null && board[13][i] != "")
-					scores[1]++;
-			}
+			scores[0] = getNumStones(board[6]);
+			scores[1] = getNumStones(board[13]);
+
 			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
+
+			await new Promise(r => setTimeout(r, 100));
 
 			// Check for the end of the game.
 			if (scores[0] + scores[1] == 36) {
