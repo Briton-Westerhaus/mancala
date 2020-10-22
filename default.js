@@ -1,5 +1,8 @@
+const PLAYER_ONE = true;
+const PLAYER_TWO = false;
+
 let board = new Array(14);
-let user = true; // player one
+let user = PLAYER_ONE;
 let players;
 let difficulty;
 let scores =  [0, 0];
@@ -354,7 +357,7 @@ async function humanTurn(element) {
 	} else {
 		// Check whether the turn advances or if the opposite player has no legal moves.
 		let empty;
-		if (user) {
+		if (user == PLAYER_ONE) {
 			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
@@ -362,7 +365,7 @@ async function humanTurn(element) {
 			}
 		}
 
-		if (!user) {
+		if (user == PLAYER_TWO) {
 			empty = isEmpty(board, user);
 			if (empty) {
 				switchUser();
@@ -371,7 +374,7 @@ async function humanTurn(element) {
 		}
 		
 		// Perform computer move.
-		if (players == 1 && !user) {
+		if (players == 1 && user == PLAYER_TWO) {
 			//drawBoard();
 			await computerTurn();
 
@@ -397,14 +400,14 @@ async function humanTurn(element) {
 					window.location.reload();
 			} else {
 				// Check whether the turn advances or if the opposite player has no legal moves.
-				if (user) {
+				if (user == PLAYER_ONE) {
 					empty = isEmpty(board, user);
 					if(empty){
 						switchUser();
 						alert("It is still " + names[1] + "'s turn because " + (players == 1 ? "you have" : names[0] + " has") + " no legal moves.");
 					}
 				}
-				if (!user) {
+				if (user == PLAYER_TWO) {
 					empty = isEmpty(board, user);
 					if (empty) {
 						switchUser();
@@ -487,7 +490,7 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
 						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
 					} else {
-						moveVal = -36
+						moveVal = 36;
 					}
 					if (moveVal <= maxMoveVal) {
 						otherMaxMove = maxMove;
@@ -508,9 +511,9 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
 						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
 					} else {
-						moveVal = -36
+						moveVal = -36;
 					}
-					if(moveVal >= maxMoveVal){
+					if (moveVal >= maxMoveVal){
 						maxMove = i;
 						maxMoveVal = moveVal;
 					}
@@ -541,12 +544,12 @@ function getNumStones(pit) {
  */
 async function switchUser() {
 	user = !user;
-	if (user) {
+	if (user == PLAYER_ONE) {
 		document.getElementById("player1").className = "currentPlayer";
 		document.getElementById("player2").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
 		document.getElementById("PlayerIndicator").style.bottom = "85px";
-	} else {
+	} else { // PLAYER_TWO
 		document.getElementById("player2").className = "currentPlayer";
 		document.getElementById("player1").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
@@ -731,7 +734,7 @@ async function animateMove(element) {
 	if (spot == 6 && user || spot == 13 && !user)
 		switchUser();
 
-	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == PLAYER_ONE && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		await moveStone(document.getElementById(spot), document.getElementById(6));
 		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
 		board[6].push(board[spot].pop());
@@ -740,7 +743,7 @@ async function animateMove(element) {
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
 	}
-	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == PLAYER_TWO && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		await moveStone(document.getElementById(spot), document.getElementById(13));
 		emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
 		board[13].push(board[spot].pop());
@@ -767,12 +770,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	let toMove = thisBoard[moveSquare];
 	thisBoard[moveSquare] = [];
 	
-	if ((user && realUser) || (!realUser && tempUser)) {
+	if ((user == PLAYER_ONE && realUser) || (!realUser && tempUser == PLAYER_ONE)) {
 		// Move the stones.
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (tempUser ? 6 : 13)) // This is backwards because I'm dumb?
+			if (moveSquare == (tempUser == PLAYER_ONE ? 6 : 13)) // This is backwards because I'm dumb?
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
@@ -793,7 +796,6 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			// TODO: Make it so these happen all at once. 
 			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
 			if (realUser) {
 				await moveStone(document.getElementById(moveSquare), document.getElementById(13));
@@ -865,7 +867,7 @@ function copyBoard(theBoard) {
 function isEmpty(theBoard, theUser) {
 	let i = 0;
 	let max = 6;
-	if (!theUser) {
+	if (theUser == PLAYER_TWO) {
 		i = 7;
 		max = 13;
 	}
