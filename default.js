@@ -322,15 +322,13 @@ function drawBoard() {
  */
 async function humanTurn(element) {
 	//this is called when a player clicks on a board square
+	let endPit;
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
 
-	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
-		await animateMove(element);
-		await switchUser();
-		activatePits();
-		//drawBoard();
+	if ((user == PLAYER_ONE && element.id < 6) || (user == PLAYER_TWO && element.id > 6 && element.id != 13)) {
+		endPit = await animateMove(element);
 	} else {
 		return false;
 	}
@@ -360,18 +358,22 @@ async function humanTurn(element) {
 		if (user == PLAYER_ONE) {
 			empty = isEmpty(board, user);
 			if (empty) {
-				switchUser();
 				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
+			} else {
+				if (endPit != 6)
+					await switchUser();
+			}
+		} else { // player two
+			empty = isEmpty(board, user);
+			if (empty) {
+				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
+			} else {
+				if (endPit != 13)
+					await switchUser();
 			}
 		}
 
-		if (user == PLAYER_TWO) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
-			}
-		}
+		activatePits();
 		
 		// Perform computer move.
 		if (players == 1 && user == PLAYER_TWO) {
@@ -466,29 +468,25 @@ async function computerTurn() {
  * @param {Array.<Array.<String>>} tempBoard - A temporary board used to determine future moves.
  * @param {Number} move - Index of the pit used for the move.
  * @param {Number} level - The depth of the recursion.
- * @param {Boolean} temporUser - The temporary user: true is player one, false is player two.
+ * @param {Boolean} tempUser - The temporary user: true is player one, false is player two.
  */
-async function computerTurnRecurse(tempBoard, move, level, temporUser) {
-	let tempUser = !temporUser;
+async function computerTurnRecurse(tempBoard, move, level, tempUser) {
 	let maxMoveVal = 36;
 	let moveVal = 36;
 	let maxMove;
 	let otherMaxMove;
-	let empty = isEmpty(tempBoard, !temporUser);
-	if (empty)
+	if (isEmpty(tempBoard, tempUser))
 		tempUser = !tempUser;
-	empty = (empty && isEmpty(tempBoard, temporUser));
 	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
 		await computerMove(tempBoard, move, tempUser, false);
-		temporUser = tempUser;
-		if (temporUser) {
+		if (tempUser == PLAYER_ONE) {
 			for (let i = 0; i < 6; i++) {
-				if (level == recursiveDepth || empty) {
+				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
-				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
+				if (getNumStones(tempBoard[i]) > 1) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser);
 					} else {
 						moveVal = 36;
 					}
@@ -499,17 +497,16 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
 					}
 				}
 			}
-		}
-		if (!temporUser) {
+		} else { // PLAYER_TWO
 			maxMoveVal = -36;
 			moveVal = -36;
 			for (let i = 7; i < 13; i++) {
-				if (level == recursiveDepth || empty) {
+				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
-				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
+				if (getNumStones(tempBoard[i]) > 0) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser);
 					} else {
 						moveVal = -36;
 					}
@@ -536,7 +533,6 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
  */
 function getNumStones(pit) {
 	return pit.length; // This might be totally unneccessary. 
-	// return pit.findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -730,10 +726,6 @@ async function animateMove(element) {
 		playAudio(emptyIndex);
 	}
 
-	// Player ended in their cache. They have another turn. 
-	if (spot == 6 && user || spot == 13 && !user)
-		switchUser();
-
 	if (user == PLAYER_ONE && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		await moveStone(document.getElementById(spot), document.getElementById(6));
 		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
@@ -752,8 +744,7 @@ async function animateMove(element) {
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
-
-	activatePits();
+	return spot;
 }
 
 /**
@@ -872,7 +863,7 @@ function isEmpty(theBoard, theUser) {
 		max = 13;
 	}
 	for (i; i < max; i++) {
-		if (theBoard[i][0] != null && theBoard[i][0] != "")
+		if (getNumStones(theBoard[i]) > 0)
 			return false;
 	}
 	return true;
