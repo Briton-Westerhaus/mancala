@@ -485,9 +485,10 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
 				}
 				if (getNumStones(tempBoard[i]) > 1) {
-					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveStack.push(i);
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, [...moveStack]);
+					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes.
+						let tempMoveStack = [...moveStack];
+						tempMoveStack.push(i)
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
 						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = 36;
@@ -508,8 +509,9 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 				}
 				if (getNumStones(tempBoard[i]) > 0) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveStack.push(i);
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, [...moveStack]);
+						let tempMoveStack = [...moveStack];
+						tempMoveStack.push(i);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
 						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = -36;
