@@ -11,7 +11,7 @@ let recursiveDepth;
 let missedMovesPercentage;
 
 const recursiveDepths = [0, 2, 3, 5, 7];
-const missedMovesPercentages = [1, .3, .15, .05, 0];
+const missedMovesPercentages = [1, 0, .15, .05, 0];
 
 /**
  * Shows the help modal.
@@ -479,6 +479,7 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 		tempUser = !tempUser;
 	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
 		await computerMove(tempBoard, move, tempUser, false);
+		tempUser = !tempUser;
 		if (tempUser == PLAYER_ONE) {
 			for (let i = 0; i < 6; i++) {
 				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
@@ -489,7 +490,7 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 						let tempMoveStack = [...moveStack];
 						tempMoveStack.push(i)
 						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
-						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
+						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = 36;
 					}
@@ -512,7 +513,7 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 						let tempMoveStack = [...moveStack];
 						tempMoveStack.push(i);
 						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
-						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
+						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = -36;
 					}
