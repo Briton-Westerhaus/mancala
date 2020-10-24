@@ -436,7 +436,7 @@ async function computerTurn() {
 		moveVal = -37;
 		for (let i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user);
+				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user, [i]);
 				if (moveVal > maxMoveVal) {
 					maxMoveVal = moveVal;
 					maxMove = i;
@@ -470,7 +470,7 @@ async function computerTurn() {
  * @param {Number} level - The depth of the recursion.
  * @param {Boolean} tempUser - The temporary user: true is player one, false is player two.
  */
-async function computerTurnRecurse(tempBoard, move, level, tempUser) {
+async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) {
 	let maxMoveVal = 36;
 	let moveVal = 36;
 	let maxMove;
@@ -486,7 +486,9 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser) {
 				}
 				if (getNumStones(tempBoard[i]) > 1) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser);
+						moveStack.push(i);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, [...moveStack]);
+						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = 36;
 					}
@@ -506,7 +508,9 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser) {
 				}
 				if (getNumStones(tempBoard[i]) > 0) {
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser);
+						moveStack.push(i);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, [...moveStack]);
+						console.log("Recursive path: " + moveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = -36;
 					}
