@@ -445,7 +445,7 @@ async function computerTurn() {
 			}
 		}
 		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
-		await computerMove(board, maxMove, user, true);
+		await computerMove(board, maxMove, {'user': user}, true);
 		user = !user;
 		empty = isEmpty(board, !user);
 		if (empty) {
@@ -478,8 +478,9 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 	if (isEmpty(tempBoard, tempUser))
 		tempUser = !tempUser;
 	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
-		await computerMove(tempBoard, move, tempUser, false);
-		tempUser = !tempUser;
+		let userContainer = {'user': tempUser};
+		await computerMove(tempBoard, move, userContainer, false);
+		tempUser = !userContainer['user'];
 		if (tempUser == PLAYER_ONE) {
 			for (let i = 0; i < 6; i++) {
 				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
@@ -489,7 +490,7 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes.
 						let tempMoveStack = [...moveStack];
 						tempMoveStack.push(i)
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, tempUser, tempMoveStack);
 						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = 36;
@@ -512,7 +513,7 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
 						let tempMoveStack = [...moveStack];
 						tempMoveStack.push(i);
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, !tempUser, tempMoveStack);
+						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, tempUser, tempMoveStack);
 						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = -36;
@@ -758,7 +759,7 @@ async function animateMove(element) {
  * 
  * @param {Array.<Array.<String>>} thisBoard - The board used for the computer move.
  * @param {Number} moveSquare - The pit of the move.
- * @param {Boolean} tempUser - The active player, true for player one.
+ * @param {Object} tempUser - The active player, true for player one. Stored in an object to pass as a reference.
  * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
  */
 async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
@@ -768,12 +769,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	let toMove = thisBoard[moveSquare];
 	thisBoard[moveSquare] = [];
 	
-	if ((user == PLAYER_ONE && realUser) || (!realUser && tempUser == PLAYER_ONE)) {
+	if ((user == PLAYER_ONE && realUser) || (!realUser && tempUser['user'] == PLAYER_ONE)) {
 		// Move the stones.
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (tempUser == PLAYER_ONE ? 6 : 13)) // This is backwards because I'm dumb?
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 6 : 13)) // This is backwards because I'm dumb?
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
@@ -790,7 +791,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			if (realUser)
 				user = !user;
 			else
-				tempUser = !tempUser;
+			tempUser['user'] = !tempUser['user'];
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
@@ -814,7 +815,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// This is when we're simulating a player turn during recursion. 
 	while (toMove.length > 0) {
 		moveSquare++;
-		if (moveSquare == (tempUser ? 13 : 6))
+		if (moveSquare == (tempUser['user'] ? 13 : 6))
 			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
@@ -825,7 +826,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		if (realUser)
 			user = !user;
 		else
-			tempUser = !tempUser;
+			tempUser['user'] = !tempUser['user'];
 	}
 
 	// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
