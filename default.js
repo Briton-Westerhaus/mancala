@@ -429,14 +429,13 @@ async function computerTurn() {
 	let moveVal;
 	let maxMove;
 	let empty;
-	user = !user;
-	while (user) {
+	while (!user) {
 		//drawBoard();
 		maxMoveVal = -37;
 		moveVal = -37;
 		for (let i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user, [i]);
+				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, user, [i]);
 				if (moveVal > maxMoveVal) {
 					maxMoveVal = moveVal;
 					maxMove = i;
@@ -769,12 +768,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	let toMove = thisBoard[moveSquare];
 	thisBoard[moveSquare] = [];
 	
-	if ((user == PLAYER_ONE && realUser) || (!realUser && tempUser['user'] == PLAYER_ONE)) {
+	if ((user == PLAYER_TWO && realUser) || (!realUser && tempUser['user'] == PLAYER_TWO)) {
 		// Move the stones.
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 6 : 13)) // This is backwards because I'm dumb?
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
@@ -815,7 +814,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// This is when we're simulating a player turn during recursion. 
 	while (toMove.length > 0) {
 		moveSquare++;
-		if (moveSquare == (tempUser['user'] ? 13 : 6))
+		if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
 			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
