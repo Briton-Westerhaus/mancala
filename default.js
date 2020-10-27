@@ -11,7 +11,7 @@ let recursiveDepth;
 let missedMovesPercentage;
 
 const recursiveDepths = [0, 2, 3, 5, 7];
-const missedMovesPercentages = [1, 0, .15, .05, 0];
+const missedMovesPercentages = [1, 0.3, .15, .05, 0];
 
 /**
  * Shows the help modal.
@@ -458,6 +458,7 @@ async function computerTurn() {
 		}
 		//drawBoard();
 	}
+	user = !user; // We change this so we can change it back with
 	await switchUser();
 	activatePits();
 }
@@ -790,7 +791,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			if (realUser)
 				user = !user;
 			else
-			tempUser['user'] = !tempUser['user'];
+				tempUser['user'] = !tempUser['user'];
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
