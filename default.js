@@ -356,17 +356,17 @@ async function humanTurn(element) {
 		// Check whether the turn advances or if the opposite player has no legal moves.
 		let empty;
 		if (user == PLAYER_ONE) {
-			empty = isEmpty(board, user);
+			empty = isEmpty(board, !user);
 			if (empty) {
-				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
+				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
 			} else {
 				if (endPit != 6)
 					await switchUser();
 			}
 		} else { // player two
-			empty = isEmpty(board, user);
+			empty = isEmpty(board, !user);
 			if (empty) {
-				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
+				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
 			} else {
 				if (endPit != 13)
 					await switchUser();
@@ -446,7 +446,7 @@ async function computerTurn() {
 		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
 		await computerMove(board, maxMove, {'user': user}, true);
 		user = !user;
-		empty = isEmpty(board, !user);
+		empty = isEmpty(board, user);
 		if (empty) {
 			if (getNumStones(board[13]) + getNumStones(board[6]) == 36) {
 				return;
