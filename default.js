@@ -354,21 +354,18 @@ async function humanTurn(element) {
 			window.location.reload();
 	} else {
 		// Check whether the turn advances or if the opposite player has no legal moves.
-		let empty;
 		if (user == PLAYER_ONE) {
-			empty = isEmpty(board, !user);
-			if (empty) {
+			if (isEmpty(board, !user)) {
 				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
 			} else {
-				if (endPit != 6)
+				if (endPit != 6 || isEmpty(board, user))
 					await switchUser();
 			}
 		} else { // player two
-			empty = isEmpty(board, !user);
-			if (empty) {
+			if (isEmpty(board, !user)) {
 				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
 			} else {
-				if (endPit != 13)
+				if (endPit != 13|| isEmpty(board, user))
 					await switchUser();
 			}
 		}
