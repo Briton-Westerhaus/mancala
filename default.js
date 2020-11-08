@@ -478,6 +478,10 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 		let userContainer = {'user': tempUser};
 		await computerMove(tempBoard, move, userContainer, false);
 		tempUser = !userContainer['user'];
+		let pitCounts = tempBoard.map(getNumStones);
+		let displayboard = [("|" + getNumStones(tempBoard[13]) + "|" + pitCounts.slice(7, 13).reverse().join("|") + "|" + getNumStones(tempBoard[6]) + "|"), ("| |" + pitCounts.slice(0, 6).join("|") + "| |")].join("\n");
+		console.log("Recursive path: " + moveStack.toString());
+		console.log(displayboard);
 		if (tempUser == PLAYER_ONE) {
 			for (let i = 0; i < 6; i++) {
 				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
@@ -488,7 +492,6 @@ async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) 
 						let tempMoveStack = [...moveStack];
 						tempMoveStack.push(i)
 						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, tempUser, tempMoveStack);
-						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
 					} else {
 						moveVal = 36;
 					}
