@@ -13,6 +13,24 @@ let missedMovesPercentage;
 const recursiveDepths = [0, 2, 3, 5, 7];
 const missedMovesPercentages = [1, 0.3, .15, .05, 0];
 
+class gameNode {
+	nextNode;
+	depth;
+	initialValue;
+	value;
+	player;
+	bestMove;
+
+	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null) {
+		this.nextNode = nextNode;
+		this.depth = depth;
+		this.initialValue = initialValue;
+		this.value = value;
+		this.player = player;
+		this.bestMove = bestMove;
+	}
+}
+
 /**
  * Shows the help modal.
  */
