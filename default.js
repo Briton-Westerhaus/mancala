@@ -20,6 +20,7 @@ class gameNode {
 	value;
 	player;
 	bestMove;
+	board;
 
 	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null) {
 		this.nextNode = nextNode;
@@ -28,6 +29,18 @@ class gameNode {
 		this.value = value;
 		this.player = player;
 		this.bestMove = bestMove;
+	}
+
+	clone() {
+		cloned = new gameNode();
+		cloned.nextNode = this.nextNode;
+		cloned.depth = this.depth;
+		cloned.initialValue = this.initialValue;
+		cloned.value = this.value;
+		cloned.player = this.player;
+		cloned.bestMove = this.bestMove;
+		cloned.board = this.board;
+		return cloned;
 	}
 }
 
@@ -483,7 +496,36 @@ async function computerTurn() {
  * @param {gameNode} gameState - a gameNode representing the current state of the game
  */
 async function chooseMove(gameState) {
-
+	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
+		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
+		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
+		let value = null;
+		for (let i = start; i++; i < end) {
+			if (getNumStones(gameState.board[i]) > 1) { // legal move
+				nextGameState = gameState.clone();
+				let userContainer = {'user': nextGameState.player};
+				await computerMove(nextGameState.board, i, userContainer, false);
+				nextGameState.player = !userContainer['user'];	
+				nextGameState.level++;
+				nextGameState.value = nextGameState.board[13] - nextGameState.board[6];
+				chooseMove(nextGameState);
+				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
+					if (value == null || nextGameState.value > gameState.value) {
+						gameState.value = nextGameState.value;
+						gameState.nextNode = nextGameState;
+						gameState.bestMove = i;
+					}
+				} else { // HUman. Minimizing
+					if (value == null || nextGameState.value < gameState.value) {
+						gameState.value = nextGameState.value;
+						gameState.nextNode = nextGameState;
+						gameState.bestMove = i;
+					}
+				}
+			}
+		}
+	}
+	return gameState;
 }
 
 /**
