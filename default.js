@@ -10,8 +10,8 @@ let names = Array(2);
 let recursiveDepth;
 let missedMovesPercentage;
 
-const recursiveDepths = [0, 2, 3, 5, 7];
-const missedMovesPercentages = [1, 0.3, .15, .05, 0];
+const recursiveDepths = [null, 2, 3, 5, 7];
+const missedMovesPercentages = [null, 0.3, .15, .05, 0];
 
 class gameNode {
 	nextNode;
@@ -476,6 +476,14 @@ async function computerTurn() {
 	user = !user; // We change this so we can change it back with
 	await switchUser();
 	activatePits();
+}
+
+/**
+ * 
+ * @param {gameNode} gameState - a gameNode representing the current state of the game
+ */
+async function chooseMove(gameState) {
+
 }
 
 /**
