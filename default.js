@@ -22,24 +22,25 @@ class gameNode {
 	bestMove;
 	board;
 
-	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null) {
+	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null) {
 		this.nextNode = nextNode;
 		this.depth = depth;
 		this.initialValue = initialValue;
 		this.value = value;
 		this.player = player;
 		this.bestMove = bestMove;
+		this.board = board;
 	}
 
 	clone() {
-		cloned = new gameNode();
+		let cloned = new gameNode();
 		cloned.nextNode = this.nextNode;
 		cloned.depth = this.depth;
 		cloned.initialValue = this.initialValue;
 		cloned.value = this.value;
 		cloned.player = this.player;
 		cloned.bestMove = this.bestMove;
-		cloned.board = this.board;
+		cloned.board = copyBoard(this.board);
 		return cloned;
 	}
 }
@@ -457,9 +458,12 @@ async function computerTurn() {
 	let moveVal;
 	let maxMove;
 	let empty;
+	let gameState;
 	while (!user) {
+		gameState = new gameNode(null, 0, getNumStones(board[13] - board[6]), 0, PLAYER_TWO, null, copyBoard(board))
+		gameState = await chooseMove(gameState);
 		//drawBoard();
-		maxMoveVal = -37;
+		/*maxMoveVal = -37;
 		moveVal = -37;
 		for (let i = 7; i < 13; i++) {
 			if (board[i][0] != null && board[i][0] != "") {
@@ -470,9 +474,9 @@ async function computerTurn() {
 				}
 				//alert("moveVal: " + moveVal);
 			}
-		}
+		}*/
 		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
-		await computerMove(board, maxMove, {'user': user}, true);
+		await computerMove(board, gameState.bestMove, {'user': user}, true);
 		user = !user;
 		empty = isEmpty(board, user);
 		if (empty) {
@@ -500,14 +504,14 @@ async function chooseMove(gameState) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
 		let value = null;
-		for (let i = start; i++; i < end) {
+		for (let i = start; i < end; i++) {
 			if (getNumStones(gameState.board[i]) > 1) { // legal move
 				nextGameState = gameState.clone();
 				let userContainer = {'user': nextGameState.player};
 				await computerMove(nextGameState.board, i, userContainer, false);
 				nextGameState.player = !userContainer['user'];	
-				nextGameState.level++;
-				nextGameState.value = nextGameState.board[13] - nextGameState.board[6];
+				nextGameState.depth++;
+				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
 				chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (value == null || nextGameState.value > gameState.value) {
@@ -515,7 +519,7 @@ async function chooseMove(gameState) {
 						gameState.nextNode = nextGameState;
 						gameState.bestMove = i;
 					}
-				} else { // HUman. Minimizing
+				} else { // Human. Minimizing
 					if (value == null || nextGameState.value < gameState.value) {
 						gameState.value = nextGameState.value;
 						gameState.nextNode = nextGameState;
