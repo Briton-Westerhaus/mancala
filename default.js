@@ -512,6 +512,8 @@ async function chooseMove(gameState) {
 				nextGameState.player = !userContainer['user'];	
 				nextGameState.depth++;
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
+				nextGameState.nextNode = null;
+				nextGameState.bestMove = null;
 				chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (value == null || nextGameState.value > gameState.value) {
