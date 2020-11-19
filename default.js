@@ -462,6 +462,11 @@ async function computerTurn() {
 	while (!user) {
 		gameState = new gameNode(null, 0, getNumStones(board[13] - board[6]), 0, PLAYER_TWO, null, copyBoard(board))
 		gameState = await chooseMove(gameState);
+		let tempState = gameState;
+		while (tempState != null) {
+			console.log(tempState);
+			tempState = tempState.nextNode;
+		}
 		//drawBoard();
 		/*maxMoveVal = -37;
 		moveVal = -37;
@@ -513,7 +518,7 @@ async function chooseMove(gameState) {
 				nextGameState.depth++;
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
 				nextGameState.nextNode = null;
-				nextGameState.bestMove = null;
+				nextGameState.bestMove = null; 	
 				chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (value == null || nextGameState.value > gameState.value) {
