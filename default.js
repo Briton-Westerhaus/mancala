@@ -9,6 +9,7 @@ let scores =  [0, 0];
 let names = Array(2);
 let recursiveDepth;
 let missedMovesPercentage;
+let rootGameState;
 
 const recursiveDepths = [null, 2, 3, 5, 7];
 const missedMovesPercentages = [null, 0.3, .15, .05, 0];
@@ -461,6 +462,7 @@ async function computerTurn() {
 	let gameState;
 	while (!user) {
 		gameState = new gameNode(null, 0, getNumStones(board[13] - board[6]), 0, PLAYER_TWO, null, copyBoard(board))
+		rootGameState = gameState;
 		gameState = await chooseMove(gameState);
 		let tempState = gameState;
 		while (tempState != null) {
@@ -505,6 +507,13 @@ async function computerTurn() {
  * @param {gameNode} gameState - a gameNode representing the current state of the game
  */
 async function chooseMove(gameState) {
+	console.log("Entering chooseMove with game state:");
+	console.log(gameState);
+	let tempState = rootGameState;
+	while (tempState != null) {
+		console.log(tempState);
+		tempState = tempState.nextNode;
+	}
 	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
