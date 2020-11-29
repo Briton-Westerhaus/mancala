@@ -35,7 +35,8 @@ class gameNode {
 
 	clone() {
 		let cloned = new gameNode();
-		cloned.nextNode = this.nextNode;
+		if (this.nextNode != null)
+			cloned.nextNode = this.nextNode.clone();
 		cloned.depth = this.depth;
 		cloned.initialValue = this.initialValue;
 		cloned.value = this.value;
@@ -509,11 +510,7 @@ async function computerTurn() {
 async function chooseMove(gameState) {
 	console.log("Entering chooseMove with game state:");
 	console.log(gameState);
-	let tempState = rootGameState;
-	while (tempState != null) {
-		console.log(tempState);
-		tempState = tempState.nextNode;
-	}
+	console.log(rootGameState);
 	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
@@ -528,7 +525,7 @@ async function chooseMove(gameState) {
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
 				nextGameState.nextNode = null;
 				nextGameState.bestMove = null; 	
-				chooseMove(nextGameState);
+				chooseMove(nextGameState.clone());
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (value == null || nextGameState.value > gameState.value) {
 						gameState.value = nextGameState.value;
