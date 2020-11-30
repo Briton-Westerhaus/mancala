@@ -929,6 +929,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			thisBoard[6].push(toMove.pop());
 		}
 	}
+	return;
 }
 
 /**
