@@ -464,7 +464,7 @@ async function computerTurn() {
 	while (!user) {
 		gameState = new gameNode(null, 0, getNumStones(board[13] - board[6]), 0, PLAYER_TWO, null, copyBoard(board))
 		rootGameState = gameState;
-		gameState = await chooseMove(gameState);
+		gameState = chooseMove(gameState);
 		let tempState = gameState;
 		while (tempState != null) {
 			console.log(tempState);
@@ -507,7 +507,7 @@ async function computerTurn() {
  * 
  * @param {gameNode} gameState - a gameNode representing the current state of the game
  */
-async function chooseMove(gameState) {
+function chooseMove(gameState) {
 	console.log("Entering chooseMove with game state:");
 	console.log(gameState);
 	console.log(rootGameState);
@@ -519,7 +519,7 @@ async function chooseMove(gameState) {
 			if (getNumStones(gameState.board[i]) > 1) { // legal move
 				nextGameState = gameState.clone();
 				let userContainer = {'user': nextGameState.player};
-				await computerMove(nextGameState.board, i, userContainer, false);
+				simulateComputerMove(nextGameState.board, i, userContainer);
 				nextGameState.player = !userContainer['user'];	
 				nextGameState.depth++;
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
@@ -838,6 +838,76 @@ async function animateMove(element) {
 		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
 	return spot;
+}
+
+/**
+ * 
+ * @param {Array.<Array.<String>>} thisBoard - The board used for the computer move.
+ * @param {Number} moveSquare - The pit of the move.
+ * @param {Object} tempUser - The active player, true for player one. Stored in an object to pass as a reference.
+ */
+function simulateComputerMove(thisBoard, moveSquare, tempUser) {
+	const initialMoveSquare = moveSquare;
+	
+	// Move stones to temporary array.
+	let toMove = thisBoard[moveSquare];
+	thisBoard[moveSquare] = [];
+	
+	if (tempUser['user'] == PLAYER_TWO) {
+		// Move the stones.
+		let emptyIndex;
+		while (toMove.length > 0) {
+			moveSquare++;
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
+				moveSquare++;
+			if(moveSquare > 13)
+				moveSquare = 0;
+			
+			emptyIndex = getNumStones(thisBoard[moveSquare]); // The number of stones also indicates the first empty slot.
+			thisBoard[moveSquare].push(toMove.pop());
+		}
+		// Computer ended in their cache. They have another turn. 
+		if (moveSquare == 13) {
+			tempUser['user'] = !tempUser['user'];
+
+		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
+		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
+			thisBoard[13].push(thisBoard[moveSquare].pop());
+			while (thisBoard[12 - moveSquare].length > 0) {
+				thisBoard[13].push(thisBoard[12 - moveSquare].pop());
+			}
+		}
+	} else {
+		while (toMove.length > 0) {
+			moveSquare++;
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
+				moveSquare++;
+			if(moveSquare > 13)
+				moveSquare = 0;
+			thisBoard[moveSquare].push(toMove.pop());
+		}
+		// The final stone ends in the cache, so the player gets another turn. 
+		if (moveSquare == 6) {
+			tempUser['user'] = !tempUser['user'];
+		}
+
+		// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
+		if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+			
+			// Move stones to temporary array.
+			toMove = thisBoard[6 + moveSquare];
+			thisBoard[6 + moveSquare] = [];
+				
+			// Move the last moved stone to the cache.
+			thisBoard[6].push(thisBoard[moveSquare].pop());
+
+			// Do the actual moving.
+			while (toMove.length > 0) {
+				thisBoard[6].push(toMove.pop());
+			}
+		}
+	}
 }
 
 /**
