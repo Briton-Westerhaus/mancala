@@ -462,7 +462,7 @@ async function computerTurn() {
 	let empty;
 	let gameState;
 	while (!user) {
-		gameState = new gameNode(null, 0, getNumStones(board[13] - board[6]), 0, PLAYER_TWO, null, copyBoard(board))
+		gameState = new gameNode(null, 0, getNumStones(board[13]) - getNumStones(board[6]), 0, PLAYER_TWO, null, copyBoard(board))
 		rootGameState = gameState;
 		gameState = chooseMove(gameState);
 		let tempState = gameState;
@@ -525,7 +525,7 @@ function chooseMove(gameState) {
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
 				nextGameState.nextNode = null;
 				nextGameState.bestMove = null; 	
-				chooseMove(nextGameState.clone());
+				nextGameState = chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (value == null || nextGameState.value > gameState.value) {
 						gameState.value = nextGameState.value;
