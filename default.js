@@ -514,7 +514,6 @@ function chooseMove(gameState) {
 	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
-		let value = null;
 		for (let i = start; i < end; i++) {
 			if (getNumStones(gameState.board[i]) > 1) { // legal move
 				nextGameState = gameState.clone();
@@ -527,16 +526,18 @@ function chooseMove(gameState) {
 				nextGameState.bestMove = null; 	
 				nextGameState = chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
-					if (value == null || nextGameState.value > gameState.value) {
+					if (gameState.nextNode == null || nextGameState.value > gameState.value) {
 						gameState.value = nextGameState.value;
 						gameState.nextNode = nextGameState;
 						gameState.bestMove = i;
+						value = nextGameState.Value;
 					}
 				} else { // Human. Minimizing
-					if (value == null || nextGameState.value < gameState.value) {
+					if (gameState.nextNode == null || nextGameState.value < gameState.value) {
 						gameState.value = nextGameState.value;
 						gameState.nextNode = nextGameState;
 						gameState.bestMove = i;
+						value = nextGameState.Value;
 					}
 				}
 			}
