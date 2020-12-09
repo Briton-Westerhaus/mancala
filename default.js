@@ -22,8 +22,9 @@ class gameNode {
 	player;
 	bestMove;
 	board;
+	moves; // This is just used for debugging right now. 
 
-	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null) {
+	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null, moves = []) {
 		this.nextNode = nextNode;
 		this.depth = depth;
 		this.initialValue = initialValue;
@@ -31,6 +32,7 @@ class gameNode {
 		this.player = player;
 		this.bestMove = bestMove;
 		this.board = board;
+		this.moves = [...moves];
 	}
 
 	clone() {
@@ -43,6 +45,7 @@ class gameNode {
 		cloned.player = this.player;
 		cloned.bestMove = this.bestMove;
 		cloned.board = copyBoard(this.board);
+		cloned.moves = [...this.moves];
 		return cloned;
 	}
 }
@@ -523,7 +526,8 @@ function chooseMove(gameState) {
 				nextGameState.depth++;
 				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
 				nextGameState.nextNode = null;
-				nextGameState.bestMove = null; 	
+				nextGameState.bestMove = null;
+				nextGameState.moves.push(i);
 				nextGameState = chooseMove(nextGameState);
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (gameState.nextNode == null || nextGameState.value > gameState.value) {
