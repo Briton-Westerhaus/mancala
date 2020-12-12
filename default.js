@@ -518,7 +518,7 @@ function chooseMove(gameState) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
 		for (let i = start; i < end; i++) {
-			if (getNumStones(gameState.board[i]) > 1) { // legal move
+			if (getNumStones(gameState.board[i]) > 0) { // legal move
 				nextGameState = gameState.clone();
 				let userContainer = {'user': nextGameState.player};
 				simulateComputerMove(nextGameState.board, i, userContainer);
