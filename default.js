@@ -913,17 +913,9 @@ function simulateComputerMove(thisBoard, moveSquare, tempUser) {
 			}
 		}
 	}
-	if (!tempUser['user'] == PLAYER_ONE) {
-		empty = isEmpty(board, !tempUser['user']);
-		if (empty) {
-			tempUser['user'] = !tempUser['user'];
-		}
-	}
-	if (!tempUser['user'] == PLAYER_TWO) {
-		empty = isEmpty(board, !tempUser['user']);
-		if (empty) {
-			tempUser['user'] = !tempUser['user'];
-		}
+	empty = isEmpty(thisBoard, !tempUser['user']);
+	if (empty) {
+		tempUser['user'] = !tempUser['user'];
 	}
 }
 
