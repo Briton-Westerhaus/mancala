@@ -1,9 +1,51 @@
-var board = new Array(14);
-var user = true; // player one
-var players;
-var difficulty;
-var scores =  [0, 0];
-var names = Array(2);
+const PLAYER_ONE = true;
+const PLAYER_TWO = false;
+
+let board = new Array(14);
+let user = PLAYER_ONE;
+let players;
+let difficulty;
+let scores =  [0, 0];
+let names = Array(2);
+let recursiveDepth;
+let missedMovesPercentage;
+
+const recursiveDepths = [null, 1, 3, 5, 7];
+const missedMovesPercentages = [null, 0.3, .15, .05, 0];
+
+class gameNode {
+	nextNode;
+	depth;
+	initialValue;
+	value;
+	player;
+	bestMove;
+	board;
+	moves; // This is just used for debugging right now. 
+
+	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null) {
+		this.nextNode = nextNode;
+		this.depth = depth;
+		this.initialValue = initialValue;
+		this.value = value;
+		this.player = player;
+		this.bestMove = bestMove;
+		this.board = board;
+	}
+
+	clone() {
+		let cloned = new gameNode();
+		if (this.nextNode != null)
+			cloned.nextNode = this.nextNode.clone();
+		cloned.depth = this.depth;
+		cloned.initialValue = this.initialValue;
+		cloned.value = this.value;
+		cloned.player = this.player;
+		cloned.bestMove = this.bestMove;
+		cloned.board = copyBoard(this.board);
+		return cloned;
+	}
+}
 
 /**
  * Shows the help modal.
@@ -23,13 +65,13 @@ function hideModal() {
  * Sets all the variables for the game then places the stones on the board with the drawBoard() function.
  */
 function initializeBoard() {
-	var temp;
+	let temp;
 	//these three lines set the "scoreboard"
 	document.getElementById("player1").className = 'currentPlayer';
-	for (var i = 0; i < board.length; i++) {
+	for (let i = 0; i < board.length; i++) {
 		board[i] = [];
 		if (i != 6 && i != 13) { // Don't initialize the two caches.
-			for (var j = 0; j < 3; j++) {
+			for (let j = 0; j < 3; j++) {
 				temp = Math.round(3 * Math.random());
 				switch (temp) {
 					case 0:
@@ -296,8 +338,8 @@ function placeStones(element) {
  * Places or removes stones from the board
  */
 function drawBoard() {
-	for (var i = 0; i < 14; i++) {
-		for (var j = 0; j < board[i].length; j++) {
+	for (let i = 0; i < 14; i++) {
+		for (let j = 0; j < board[i].length; j++) {
 			if (board[i][j] == "red" || board[i][j] == "green" || board[i][j] == "blue" || board[i][j] == "yellow") {
 				document.getElementById("" + i + "." + j).style.backgroundImage = "url('" + board[i][j] + "_stone.png')";
 			} else {
@@ -314,40 +356,30 @@ function drawBoard() {
  */
 async function humanTurn(element) {
 	//this is called when a player clicks on a board square
+	let endPit;
 	if (board[element.id][0] == null || board[element.id][0] == "") {
 		return false;
 	}
 
-	if ((user == true && element.id < 6) || (user == false && element.id > 6 && element.id != 13)) {
-		await animateMove(element);
-		await switchUser();
-		activatePits();
-		//drawBoard();
+	if ((user == PLAYER_ONE && element.id < 6) || (user == PLAYER_TWO && element.id > 6 && element.id != 13)) {
+		endPit = await animateMove(element);
 	} else {
 		return false;
 	}
 	// Recalculate scores
-	scores[0] = 0;
-	scores[1] = 0;
-
-	for (let i = 0; i < 34; i++) {
-		if(board[6][i] != null && board[6][i] != "")
-			scores[0]++;
-	}
-
-	for (let i = 0; i < 34; i++) {
-		if(board[13][i] != null && board[13][i] != "")
-			scores[1]++;
-	}
+	scores[0] = getNumStones(board[6]);
+	scores[1] = getNumStones(board[13]);
 
 	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 	document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
 
+	await new Promise(r => setTimeout(r, 100));
+
 	// Check for the end of the game.
 	if (scores[0] + scores[1] == 36) {
-		var newOne;
+		let newOne;
 		if (scores[0] > scores[1])
-			newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+			newOne = confirm("" + (players == 1 ? "You Win!" : names[0] + " wins!") + "\n  Would you like a new game?");
 		if (scores[0] < scores[1])
 			newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
 		if (scores[0] == scores[1])
@@ -356,47 +388,43 @@ async function humanTurn(element) {
 			window.location.reload();
 	} else {
 		// Check whether the turn advances or if the opposite player has no legal moves.
-		var empty;
-		if (user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[1] + " turn because " + names[0] + " has no legal moves.");
+		if (user == PLAYER_ONE) {
+			if (isEmpty(board, !user)) {
+				alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
+			} else {
+				if (endPit != 6 || isEmpty(board, user))
+					await switchUser();
+			}
+		} else { // player two
+			if (isEmpty(board, !user)) {
+				alert("It is still " + names[1] + " turn because " + (players == 1 ? "you have":  names[0] + " has") + " no legal moves.");
+			} else {
+				if (endPit != 13|| isEmpty(board, user))
+					await switchUser();
 			}
 		}
 
-		if (!user) {
-			empty = isEmpty(board, user);
-			if (empty) {
-				switchUser();
-				alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
-			}
-		}
+		activatePits();
 		
 		// Perform computer move.
-		if (players == 1 && !user) {
+		if (players == 1 && user == PLAYER_TWO) {
 			//drawBoard();
 			await computerTurn();
 
 			// Calculate scores
-			scores[0] = 0;
-			scores[1] = 0;
-			for (let i = 0; i < 34; i++) {
-				if(board[6][i] != null && board[6][i] != "")
-					scores[0]++;
-			}
-			for (let i = 0; i < 34; i++) {
-				if(board[13][i] != null && board[13][i] != "")
-					scores[1]++;
-			}
+			scores[0] = getNumStones(board[6]);
+			scores[1] = getNumStones(board[13]);
+
 			document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
 			document.getElementById("player2").innerHTML = "" + names[1] + ": " + scores[1];
 
+			await new Promise(r => setTimeout(r, 100));
+
 			// Check for the end of the game.
 			if (scores[0] + scores[1] == 36) {
-				var newOne;
+				let newOne;
 				if(scores[0] > scores[1])
-					newOne = confirm("" + names[0] + " wins!\n  Would you like a new game?");
+					newOne = confirm("" + (players == 1 ? "You Win!" : names[0] + " wins!") + "\n  Would you like a new game?");
 				if(scores[0] < scores[1])
 					newOne = confirm("" + names[1] + " wins!\n  Would you like a new game?");
 				if(scores[0] == scores[1])
@@ -405,18 +433,18 @@ async function humanTurn(element) {
 					window.location.reload();
 			} else {
 				// Check whether the turn advances or if the opposite player has no legal moves.
-				if (user) {
+				if (user == PLAYER_ONE) {
 					empty = isEmpty(board, user);
 					if(empty){
 						switchUser();
-						alert("It is still " + names[1] + "'s turn because " + names[0] + " 1 has no legal moves.");
+						alert("It is still " + names[1] + "'s turn because " + (players == 1 ? "you have" : names[0] + " has") + " no legal moves.");
 					}
 				}
-				if (!user) {
+				if (user == PLAYER_TWO) {
 					empty = isEmpty(board, user);
 					if (empty) {
 						switchUser();
-						alert("It is still " + names[0] + "'s turn because " + names[1] + " has no legal moves.");
+						alert("It is still " + (players == 1 ? "your" : names[0] + "'s") + " turn because " + names[1] + " has no legal moves.");
 					}
 				}
 			}
@@ -428,103 +456,70 @@ async function humanTurn(element) {
  * Executes the computer turn.
  */
 async function computerTurn() {
-	var maxMoveVal;
-	var moveVal;
-	var maxMove;
-	var empty;
-	user = !user;
-	while (user) {
-		//drawBoard();
-		maxMoveVal = -37;
-		moveVal = -37;
-		for (var i = 7; i < 13; i++) {
-			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, !user);
-				if (moveVal > maxMoveVal) {
-					maxMoveVal = moveVal;
-					maxMove = i;
-				}
-				//alert("moveVal: " + moveVal);
-			}
-		}
-		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
-		await computerMove(board, maxMove, user, true);
+	let empty;
+	let gameState;
+	while (!user) {
+		gameState = new gameNode(null, 0, getNumStones(board[13]) - getNumStones(board[6]), 0, PLAYER_TWO, null, copyBoard(board))
+		gameState = chooseMove(gameState);
+		await computerMove(board, gameState.bestMove, {'user': user}, true);
 		user = !user;
-		empty = isEmpty(board, !user);
+		empty = isEmpty(board, user);
 		if (empty) {
 			if (getNumStones(board[13]) + getNumStones(board[6]) == 36) {
 				return;
 			} else {
 				user = !user;
-				//setTimeout("computerTurn();", 12);
-				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
 		}
 		//drawBoard();
 	}
+	user = !user; // We change this so we can change it back with
 	await switchUser();
 	activatePits();
 }
 
 /**
- * A recursive helper function used to determine optimal computer moves.
- * @param {Array.<Array.<String>>} tempBoard - A temporary board used to determine future moves.
- * @param {Number} move - Index of the pit used for the move.
- * @param {Number} level - The depth of the recursion.
- * @param {Boolean} temporUser - The temporary user: true is player one, false is player two.
+ * 
+ * @param {gameNode} gameState - a gameNode representing the current state of the game
  */
-async function computerTurnRecurse(tempBoard, move, level, temporUser) {
-	var tempUser = !temporUser;
-	var maxMoveVal = 36;
-	var moveVal = 36;
-	var maxMove;
-	var otherMaxMove;
-	var empty = isEmpty(tempBoard, !temporUser);
-	if (empty)
-		tempUser = !tempUser;
-	empty = (empty && isEmpty(tempBoard, temporUser));
-	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
-		await computerMove(tempBoard, move, tempUser, false);
-		temporUser = tempUser;
-		if (temporUser) {
-			for (var i = 0; i < 6; i++) {
-				if (level == difficulty || empty) {
-					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
+function chooseMove(gameState) {
+	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
+		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
+		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
+		for (let i = start; i < end; i++) {
+			if (getNumStones(gameState.board[i]) > 0) { // legal move
+				nextGameState = gameState.clone();
+				if (Math.random() > missedMovesPercentage) {
+					let userContainer = {'user': nextGameState.player};
+					simulateComputerMove(nextGameState.board, i, userContainer);
+					nextGameState.player = !userContainer['user'];	
+					nextGameState.depth++;
+					nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
+					nextGameState.nextNode = null;
+					nextGameState.bestMove = null;
+					nextGameState = chooseMove(nextGameState);
+				} else {
+					nextGameState.value = (gameState.player == PLAYER_TWO ? -36 : 36);
 				}
-				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
-					if (moveVal <= maxMoveVal) {
-						otherMaxMove = maxMove;
-						maxMoveVal = moveVal;
-						maxMove = i;
+				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
+					if (gameState.nextNode == null || nextGameState.value > gameState.value) {
+						gameState.value = nextGameState.value;
+						gameState.nextNode = nextGameState;
+						gameState.bestMove = i;
+						value = nextGameState.Value;
 					}
-				}
-			}
-		}
-		if (!temporUser) {
-			maxMoveVal = -36;
-			moveVal = -36;
-			for (var i = 7; i < 13; i++) {
-				if (level == difficulty || empty) {
-					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
-				}
-				if (tempBoard[i][0] != null && tempBoard[i][0] != "") {
-					moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, temporUser);
-					if(moveVal >= maxMoveVal){
-						maxMove = i;
-						maxMoveVal = moveVal;
+				} else { // Human. Minimizing
+					if (gameState.nextNode == null || nextGameState.value < gameState.value) {
+						gameState.value = nextGameState.value;
+						gameState.nextNode = nextGameState;
+						gameState.bestMove = i;
+						value = nextGameState.Value;
 					}
 				}
 			}
 		}
 	}
-	if (otherMaxMove != null) {
-		//alert("there is an otherMaxMove");
-		choice = Math.round(Math.random());
-		if (choice == 1 && board[otherMaxMove][0] != null && board[otherMaxMove][0] != "")
-			maxMove = otherMaxMove;
-	}
-	return maxMoveVal;
+	return gameState;
 }
 
 /**
@@ -533,7 +528,6 @@ async function computerTurnRecurse(tempBoard, move, level, temporUser) {
  */
 function getNumStones(pit) {
 	return pit.length; // This might be totally unneccessary. 
-	// return pit.findIndex(function(stone) { return !stone; });
 }
 
 /**
@@ -541,12 +535,12 @@ function getNumStones(pit) {
  */
 async function switchUser() {
 	user = !user;
-	if (user) {
+	if (user == PLAYER_ONE) {
 		document.getElementById("player1").className = "currentPlayer";
 		document.getElementById("player2").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
 		document.getElementById("PlayerIndicator").style.bottom = "85px";
-	} else {
+	} else { // PLAYER_TWO
 		document.getElementById("player2").className = "currentPlayer";
 		document.getElementById("player1").className = "";
 		document.getElementById("PlayerIndicator").style.left = "30px";
@@ -564,7 +558,7 @@ function setPlayers(howMany) {
 	document.getElementById("startgame").innerHTML = "";
 	document.getElementById("startgame").style.visiblity = "hidden";
 	names[0] = prompt("What is your name (player 1)?");
-	if (names[0] == null)
+	if (!names[0])
 		names[0] = "Player 1";
 	if (howMany == 1) {
 		document.getElementById("difficulty").style.visibility = "visible";
@@ -573,7 +567,7 @@ function setPlayers(howMany) {
 		document.getElementById("game").style.visibility = "visible";
 		document.getElementById("difficulty").innerHTML = "";
 		names[1] = prompt("What is your name (player 2)?");
-		if (names[1] == null)
+		if (!names[1])
 			names[1] = "Player 2";
 	}
 	document.getElementById("player1").innerHTML = "" + names[0] + ": " + scores[0];
@@ -611,6 +605,8 @@ function playAudio(numStones) {
  */
 function setDifficulty(howHard) {
 	difficulty = howHard;
+	recursiveDepth = recursiveDepths[difficulty];
+	missedMovesPercentage = missedMovesPercentages[difficulty];
 	document.getElementById("difficulty").style.visiblity = "hidden";
 	document.getElementById("difficulty").innerHTML = "";
 	document.getElementById("game").style.visibility = "visible";
@@ -709,7 +705,7 @@ async function animateMove(element) {
 	//let toMove = board[element.id];
 	//board[element.id] = [];
 
-	var spot = element.id;
+	let spot = element.id;
 	let emptyIndex;
 
 	for (; board[element.id].length > 0;) {
@@ -725,11 +721,7 @@ async function animateMove(element) {
 		playAudio(emptyIndex);
 	}
 
-	// Player ended in their cache. They have another turn. 
-	if (spot == 6 && user || spot == 13 && !user)
-		switchUser();
-
-	if (user == true && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == PLAYER_ONE && spot < 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		await moveStone(document.getElementById(spot), document.getElementById(6));
 		emptyIndex = getNumStones(board[6]); // The number of stones also indicates the first empty slot.
 		board[6].push(board[spot].pop());
@@ -738,7 +730,7 @@ async function animateMove(element) {
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(6));
 	}
-	if (user == false && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
+	if (user == PLAYER_TWO && spot < 13 && spot > 6 && (board[spot][1] == null || board[spot][1] == "")) {
 		await moveStone(document.getElementById(spot), document.getElementById(13));
 		emptyIndex = getNumStones(board[13]); // The number of stones also indicates the first empty slot.
 		board[13].push(board[spot].pop());
@@ -747,15 +739,88 @@ async function animateMove(element) {
 
 		await moveStones(document.getElementById(12 - spot), document.getElementById(13));
 	}
-
-	activatePits();
+	return spot;
 }
 
 /**
  * 
  * @param {Array.<Array.<String>>} thisBoard - The board used for the computer move.
  * @param {Number} moveSquare - The pit of the move.
- * @param {Boolean} tempUser - The active player, true for player one.
+ * @param {Object} tempUser - The active player, true for player one. Stored in an object to pass as a reference.
+ */
+function simulateComputerMove(thisBoard, moveSquare, tempUser) {
+	const initialMoveSquare = moveSquare;
+	
+	// Move stones to temporary array.
+	let toMove = thisBoard[moveSquare];
+	thisBoard[moveSquare] = [];
+	
+	if (tempUser['user'] == PLAYER_TWO) {
+		// Move the stones.
+		let emptyIndex;
+		while (toMove.length > 0) {
+			moveSquare++;
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
+				moveSquare++;
+			if(moveSquare > 13)
+				moveSquare = 0;
+			
+			emptyIndex = getNumStones(thisBoard[moveSquare]); // The number of stones also indicates the first empty slot.
+			thisBoard[moveSquare].push(toMove.pop());
+		}
+		// Computer ended in their cache. They have another turn. 
+		if (moveSquare == 13) {
+			tempUser['user'] = !tempUser['user'];
+
+		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
+		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
+			thisBoard[13].push(thisBoard[moveSquare].pop());
+			while (thisBoard[12 - moveSquare].length > 0) {
+				thisBoard[13].push(thisBoard[12 - moveSquare].pop());
+			}
+		}
+	} else {
+		while (toMove.length > 0) {
+			moveSquare++;
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
+				moveSquare++;
+			if(moveSquare > 13)
+				moveSquare = 0;
+			thisBoard[moveSquare].push(toMove.pop());
+		}
+		// The final stone ends in the cache, so the player gets another turn. 
+		if (moveSquare == 6) {
+			tempUser['user'] = !tempUser['user'];
+		}
+
+		// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
+		if (moveSquare < 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
+			
+			// Move stones to temporary array.
+			toMove = thisBoard[6 + moveSquare];
+			thisBoard[6 + moveSquare] = [];
+				
+			// Move the last moved stone to the cache.
+			thisBoard[6].push(thisBoard[moveSquare].pop());
+
+			// Do the actual moving.
+			while (toMove.length > 0) {
+				thisBoard[6].push(toMove.pop());
+			}
+		}
+	}
+	empty = isEmpty(thisBoard, !tempUser['user']);
+	if (empty) {
+		tempUser['user'] = !tempUser['user'];
+	}
+}
+
+/**
+ * 
+ * @param {Array.<Array.<String>>} thisBoard - The board used for the computer move.
+ * @param {Number} moveSquare - The pit of the move.
+ * @param {Object} tempUser - The active player, true for player one. Stored in an object to pass as a reference.
  * @param {Boolean} realUser - Whether the user is a real one or a simulated one.
  */
 async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
@@ -765,12 +830,12 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	let toMove = thisBoard[moveSquare];
 	thisBoard[moveSquare] = [];
 	
-	if ((user && realUser) || (!realUser && tempUser)) {
+	if ((user == PLAYER_TWO && realUser) || (!realUser && tempUser['user'] == PLAYER_TWO)) {
 		// Move the stones.
 		let emptyIndex;
 		while (toMove.length > 0) {
 			moveSquare++;
-			if (moveSquare == (tempUser ? 6 : 13)) // This is backwards because I'm dumb?
+			if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
 				moveSquare++;
 			if(moveSquare > 13)
 				moveSquare = 0;
@@ -787,11 +852,10 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			if (realUser)
 				user = !user;
 			else
-				tempUser = !tempUser;
+				tempUser['user'] = !tempUser['user'];
 
 		// Computer ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
 		} else if (moveSquare < 13 && moveSquare > 6 && (thisBoard[moveSquare][1] == null || thisBoard[moveSquare][1] == "")) {
-			// TODO: Make it so these happen all at once. 
 			emptyIndex = getNumStones(thisBoard[13]); // The number of stones also indicates the first empty slot.
 			if (realUser) {
 				await moveStone(document.getElementById(moveSquare), document.getElementById(13));
@@ -812,7 +876,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 	// This is when we're simulating a player turn during recursion. 
 	while (toMove.length > 0) {
 		moveSquare++;
-		if (moveSquare == (tempUser ? 13 : 6))
+		if (moveSquare == (tempUser['user'] == PLAYER_ONE ? 13 : 6))
 			moveSquare++;
 		if(moveSquare > 13)
 			moveSquare = 0;
@@ -823,7 +887,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 		if (realUser)
 			user = !user;
 		else
-			tempUser = !tempUser;
+			tempUser['user'] = !tempUser['user'];
 	}
 
 	// Player ended in an empty pit on their side of the board, so they get all of the stones from the opposite pit.
@@ -841,6 +905,7 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
 			thisBoard[6].push(toMove.pop());
 		}
 	}
+	return;
 }
 
 /**
@@ -848,8 +913,8 @@ async function computerMove(thisBoard, moveSquare, tempUser, realUser) {
  * @param {Array.<Array.<String>>} theBoard 
  */
 function copyBoard(theBoard) {
-	var returnBoard = Array(theBoard.length);
-	for (var i = 0; i < theBoard.length; i++){
+	let returnBoard = Array(theBoard.length);
+	for (let i = 0; i < theBoard.length; i++){
 		returnBoard[i] = theBoard[i].slice();
 	}
 	return returnBoard;
@@ -861,14 +926,14 @@ function copyBoard(theBoard) {
  * @param {Boolean} theUser - The active player, true for player one.
  */
 function isEmpty(theBoard, theUser) {
-	var i = 0;
-	var max = 6;
-	if (!theUser) {
+	let i = 0;
+	let max = 6;
+	if (theUser == PLAYER_TWO) {
 		i = 7;
 		max = 13;
 	}
 	for (i; i < max; i++) {
-		if (theBoard[i][0] != null && theBoard[i][0] != "")
+		if (getNumStones(theBoard[i]) > 0)
 			return false;
 	}
 	return true;
