@@ -9,9 +9,8 @@ let scores =  [0, 0];
 let names = Array(2);
 let recursiveDepth;
 let missedMovesPercentage;
-let rootGameState;
 
-const recursiveDepths = [null, 2, 3, 5, 7];
+const recursiveDepths = [null, 1, 3, 5, 7];
 const missedMovesPercentages = [null, 0.3, .15, .05, 0];
 
 class gameNode {
@@ -24,7 +23,7 @@ class gameNode {
 	board;
 	moves; // This is just used for debugging right now. 
 
-	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null, moves = []) {
+	constructor(nextNode = null, depth = 0, initialValue = 0, value = 0, player = PLAYER_ONE, bestMove = null, board = null) {
 		this.nextNode = nextNode;
 		this.depth = depth;
 		this.initialValue = initialValue;
@@ -32,7 +31,6 @@ class gameNode {
 		this.player = player;
 		this.bestMove = bestMove;
 		this.board = board;
-		this.moves = [...moves];
 	}
 
 	clone() {
@@ -45,7 +43,6 @@ class gameNode {
 		cloned.player = this.player;
 		cloned.bestMove = this.bestMove;
 		cloned.board = copyBoard(this.board);
-		cloned.moves = [...this.moves];
 		return cloned;
 	}
 }
@@ -459,34 +456,11 @@ async function humanTurn(element) {
  * Executes the computer turn.
  */
 async function computerTurn() {
-	let maxMoveVal;
-	let moveVal;
-	let maxMove;
 	let empty;
 	let gameState;
 	while (!user) {
 		gameState = new gameNode(null, 0, getNumStones(board[13]) - getNumStones(board[6]), 0, PLAYER_TWO, null, copyBoard(board))
-		rootGameState = gameState;
 		gameState = chooseMove(gameState);
-		let tempState = gameState;
-		while (tempState != null) {
-			console.log(tempState);
-			tempState = tempState.nextNode;
-		}
-		//drawBoard();
-		/*maxMoveVal = -37;
-		moveVal = -37;
-		for (let i = 7; i < 13; i++) {
-			if (board[i][0] != null && board[i][0] != "") {
-				moveVal = await computerTurnRecurse(copyBoard(board), i, 0, user, [i]);
-				if (moveVal > maxMoveVal) {
-					maxMoveVal = moveVal;
-					maxMove = i;
-				}
-				//alert("moveVal: " + moveVal);
-			}
-		}*/
-		//alert("Moving " + maxMove + "   with maxVal: " + maxMoveVal);
 		await computerMove(board, gameState.bestMove, {'user': user}, true);
 		user = !user;
 		empty = isEmpty(board, user);
@@ -495,8 +469,6 @@ async function computerTurn() {
 				return;
 			} else {
 				user = !user;
-				//setTimeout("computerTurn();", 12);
-				//alert("It is still player 2's turn because player 1 has no legal moves.");
 			}
 		}
 		//drawBoard();
@@ -511,24 +483,24 @@ async function computerTurn() {
  * @param {gameNode} gameState - a gameNode representing the current state of the game
  */
 function chooseMove(gameState) {
-	console.log("Entering chooseMove with game state:");
-	console.log(gameState);
-	console.log(rootGameState);
 	if (gameState.depth < recursiveDepth && !(isEmpty(gameState.board, PLAYER_ONE) && isEmpty(gameState.board, PLAYER_TWO))) {
 		let start = (gameState.player == PLAYER_ONE ? 0 : 7);
 		let end = (gameState.player == PLAYER_ONE ? 6 : 13);
 		for (let i = start; i < end; i++) {
 			if (getNumStones(gameState.board[i]) > 0) { // legal move
 				nextGameState = gameState.clone();
-				let userContainer = {'user': nextGameState.player};
-				simulateComputerMove(nextGameState.board, i, userContainer);
-				nextGameState.player = !userContainer['user'];	
-				nextGameState.depth++;
-				nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
-				nextGameState.nextNode = null;
-				nextGameState.bestMove = null;
-				nextGameState.moves.push(i);
-				nextGameState = chooseMove(nextGameState);
+				if (Math.random() > missedMovesPercentage) {
+					let userContainer = {'user': nextGameState.player};
+					simulateComputerMove(nextGameState.board, i, userContainer);
+					nextGameState.player = !userContainer['user'];	
+					nextGameState.depth++;
+					nextGameState.value = getNumStones(nextGameState.board[13]) - getNumStones(nextGameState.board[6]);
+					nextGameState.nextNode = null;
+					nextGameState.bestMove = null;
+					nextGameState = chooseMove(nextGameState);
+				} else {
+					nextGameState.value = (gameState.player == PLAYER_TWO ? -36 : 36);
+				}
 				if (gameState.player == PLAYER_TWO) { // Computer. Maximizing
 					if (gameState.nextNode == null || nextGameState.value > gameState.value) {
 						gameState.value = nextGameState.value;
@@ -548,81 +520,6 @@ function chooseMove(gameState) {
 		}
 	}
 	return gameState;
-}
-
-/**
- * A recursive helper function used to determine optimal computer moves.
- * @param {Array.<Array.<String>>} tempBoard - A temporary board used to determine future moves.
- * @param {Number} move - Index of the pit used for the move.
- * @param {Number} level - The depth of the recursion.
- * @param {Boolean} tempUser - The temporary user: true is player one, false is player two.
- */
-async function computerTurnRecurse(tempBoard, move, level, tempUser, moveStack) {
-	let maxMoveVal = 36;
-	let moveVal = 36;
-	let maxMove;
-	let otherMaxMove;
-	if (isEmpty(tempBoard, tempUser))
-		tempUser = !tempUser;
-	if (tempBoard[move][0] != null && tempBoard[move][0] != "") {
-		let userContainer = {'user': tempUser};
-		await computerMove(tempBoard, move, userContainer, false);
-		tempUser = !userContainer['user'];
-		let pitCounts = tempBoard.map(getNumStones);
-		let displayboard = [("|" + getNumStones(tempBoard[13]) + "|" + pitCounts.slice(7, 13).reverse().join("|") + "|" + getNumStones(tempBoard[6]) + "|"), ("| |" + pitCounts.slice(0, 6).join("|") + "| |")].join("\n");
-		console.log("Recursive path: " + moveStack.toString());
-		console.log(displayboard);
-		if (tempUser == PLAYER_ONE) {
-			for (let i = 0; i < 6; i++) {
-				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
-					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
-				}
-				if (getNumStones(tempBoard[i]) > 1) {
-					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes.
-						let tempMoveStack = [...moveStack];
-						tempMoveStack.push(i)
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, tempUser, tempMoveStack);
-					} else {
-						moveVal = 36;
-					}
-					if (moveVal <= maxMoveVal) {
-						otherMaxMove = maxMove;
-						maxMoveVal = moveVal;
-						maxMove = i;
-					}
-				}
-			}
-		} else { // PLAYER_TWO
-			maxMoveVal = -36;
-			moveVal = -36;
-			for (let i = 7; i < 13; i++) {
-				if (level == recursiveDepth || getNumStones(tempBoard[6]) + getNumStones(tempBoard[13]) == 36) {
-					return (getNumStones(tempBoard[13]) - getNumStones(tempBoard[6]));
-				}
-				if (getNumStones(tempBoard[i]) > 0) {
-					if (Math.random() > missedMovesPercentage) { // As part of the realism for imperfect AI, it skips the move sometimes. 
-						let tempMoveStack = [...moveStack];
-						tempMoveStack.push(i);
-						moveVal = await computerTurnRecurse(copyBoard(tempBoard), i, level + 1, tempUser, tempMoveStack);
-						console.log("Recursive path: " + tempMoveStack.toString() + ", Move value: " + moveVal);
-					} else {
-						moveVal = -36;
-					}
-					if (moveVal >= maxMoveVal){
-						maxMove = i;
-						maxMoveVal = moveVal;
-					}
-				}
-			}
-		}
-	}
-	if (otherMaxMove != null) {
-		//alert("there is an otherMaxMove");
-		choice = Math.round(Math.random());
-		if (choice == 1 && board[otherMaxMove][0] != null && board[otherMaxMove][0] != "")
-			maxMove = otherMaxMove;
-	}
-	return maxMoveVal;
 }
 
 /**
