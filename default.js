@@ -125,6 +125,8 @@ async function moveStone(startPit, endPit) {
 	//let boardStone = board[startPit.id].pop();
 	let xOffset = 0, yOffset = 0;
 
+	let xScale = 1;
+
 	let endXProp = '';
 	let endYProp = '';
 
@@ -134,6 +136,7 @@ async function moveStone(startPit, endPit) {
 	} else { //caches
 		xOffset += endPit.childNodes[1].width.baseVal.value / 2;
 		yOffset += endPit.childNodes[1].height.baseVal.value / 2;
+		xScale = .8;
 	}
 
 	endXProp += 'x';
@@ -143,7 +146,7 @@ async function moveStone(startPit, endPit) {
 	let sin = Math.sin(angle * Math.PI / 180);
 	let cos = Math.cos(angle * Math.PI / 180)
 	let distance = 32 - (32 / (endPit.childNodes.length - 1));
-	let xDistance = Math.round(distance * cos) + xOffset;
+	let xDistance = Math.round(distance * cos) * xScale + xOffset;
 	let yDistance = Math.round(distance * sin) + yOffset;
 	let startX = startPit.childNodes[startPit.childNodes.length - 1].x.baseVal.value;
 	let startY = startPit.childNodes[startPit.childNodes.length - 1].y.baseVal.value;
@@ -196,7 +199,7 @@ async function moveStone(startPit, endPit) {
  * @param {Element} endPit - The pit where the stones move to.
  */
 async function moveStones(startPit, endPit) {
-	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance;
+	let stone, xOffset, yOffset, endXProp, endYProp, angle, sin, cos, distance, xDistance, yDistance, startX, startY, transform, newXDistance, newYDistance, xScale;
 	let xDistances = [];
 	let yDistances = [];
 
@@ -206,6 +209,7 @@ async function moveStones(startPit, endPit) {
 		xOffset = 0;
 		yOffset = 0;
 
+		xScale = 1;
 
 		endXProp = '';
 		endYProp = '';
@@ -216,6 +220,7 @@ async function moveStones(startPit, endPit) {
 		} else { //caches
 			xOffset += endPit.childNodes[1].width.baseVal.value / 2;
 			yOffset += endPit.childNodes[1].height.baseVal.value / 2;
+			xScale = .8;
 		}
 
 		endXProp += 'x';
@@ -223,9 +228,9 @@ async function moveStones(startPit, endPit) {
 
 		angle = Math.ceil(Math.random() * 360);
 		sin = Math.sin(angle * Math.PI / 180);
-		cos = Math.cos(angle * Math.PI / 180)
+		cos = Math.cos(angle * Math.PI / 180);
 		distance = 32 - (32 / (endPit.childNodes.length - 1));
-		xDistance = Math.round(distance * cos) + xOffset;
+		xDistance = Math.round(distance * cos) * xScale + xOffset;
 		yDistance = Math.round(distance * sin) + yOffset;
 		startX = startPit.childNodes[startPit.childNodes.length - i - 1].x.baseVal.value;
 		startY = startPit.childNodes[startPit.childNodes.length - i - 1].y.baseVal.value;
